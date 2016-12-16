@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Appenders>
+		<!-- 配置日志输出文件名字 追加读写 -->
+		<!-- 测试库路径：/home/logs/routing.log -->
+		<!-- E:sms.log -->
+
+		<!-- 输出到单个文件 -->
+		<File name="smslog" fileName="E:/home/logs/sms.log" append="true">
+			<!-- 输出格式 -->
+			<PatternLayout pattern="%d %-5p [%t] %c{36} (%F:%L) ----- %m%n%ex" />
+		</File>
+
+		<!-- 输出到控制台的配置 -->
+		<Console name="STDOUT" target="SYSTEM_OUT">
+			<!-- 输出格式 -->
+			<PatternLayout pattern="%d %-5p [%t] %c{36} (%F:%L) ----- %m%n%ex" />
+		</Console>
+
+		<!-- 输出到分割文件并压缩 -->
+		<RollingFile name="rollingfile" fileName="E:/home/logs/sms_service.log"
+			append="true"
+			filePattern="E:/home/smslogs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+			<PatternLayout pattern="%d %-5p [%t] %c{36} (%F:%L) ----- %m%n%ex" />
+			<SizeBasedTriggeringPolicy size="50MB" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<!-- 记录器输出文件为debug级别 -->
+		<!-- 根 控制台输出级别 -->
+		<Root level="debug">
+			<AppenderRef ref="rollingfile" />
+			<AppenderRef ref="STDOUT" />
+		</Root>
+	</Loggers>
+</Configuration>

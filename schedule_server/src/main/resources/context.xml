@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx   
+    http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+    http://www.springframework.org/schema/aop 
+    http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+    http://www.springframework.org/schema/mvc   
+    http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+    http://mybatis.org/schema/mybatis-spring 
+    http://mybatis.org/schema/mybatis-spring.xsd
+    http://www.springframework.org/schema/rabbit
+    http://www.springframework.org/schema/rabbit/spring-rabbit-1.0.xsd">
+
+	<context:component-scan base-package="com" />
+
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/plain;charset=UTF-8</value>
+						<value>text/html;charset=UTF-8</value>
+						<value>application/json;charset=UTF-8</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<!-- scheduler配置 -->
+	<bean name="scheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="applicationContextSchedulerContextKey" value="applicationContextKey" />
+		<property name="configLocation" value="classpath:db.properties" />
+		<property name="autoStartup" value="true" />
+		<property name="startupDelay" value="10" /><!-- 延时启动 -->
+		<property name="triggers"><!-- 初始化任务 -->
+			<list>
+			</list>
+		</property>
+	</bean>
+
+	<!-- mybatis配置 -->
+	<!-- 注意！！任何bean的id都不要和DAO层的类重名，否则会造成mybatis自动创建实现bean失败 -->
+
+	<!-- 该包下的类支持注解，表示会被当作{@code mybatis mapper}处理 配置了之后表示可以自动引入mapper类 -->
+	<mybatis:scan base-package="com.fzrj.schedule.dao" />
+	<!-- 是否重复可以去掉？ -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.fzrj.schedule.dao" />
+	</bean>
+
+	<!--引入属性文件 -->
+	<!-- <context:property-placeholder location="classpath:db.properties" /> -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:db.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!--数据源1连接 -->
+	<bean id="orderDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- 指定连接数据库的驱动 -->
+		<property name="driverClass" value="${order.jdbc.driverClass}" />
+		<!-- 指定连接数据库的URL -->
+		<property name="jdbcUrl" value="${order.jdbc.url}" />
+		<!-- 指定连接数据库的用户名 -->
+		<property name="user" value="${order.jdbc.username}" />
+		<!-- 指定连接数据库的密码 -->
+		<property name="password" value="${order.jdbc.password}" />
+		<!-- 指定连接池中保留的最大连接数. Default:15 -->
+		<property name="maxPoolSize" value="${order.jdbc.maxPoolSize}" />
+		<!-- 指定连接池中保留的最小连接数 -->
+		<property name="minPoolSize" value="${order.jdbc.minPoolSize}" />
+		<!-- 指定连接池的初始化连接数 取值应在minPoolSize 与 maxPoolSize 之间.Default:3 -->
+		<property name="initialPoolSize" value="${order.jdbc.initialPoolSize}" />
+		<!-- 最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。 Default:0 -->
+		<property name="maxIdleTime" value="${order.jdbc.maxIdleTime}" />
+		<!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数. Default:3 -->
+		<property name="acquireIncrement" value="${order.jdbc.acquireIncrement}" />
+		<!-- JDBC的标准,用以控制数据源内加载的PreparedStatements数量。 但由于预缓存的statements属于单个connection而不是整个连接池所以设置这个参数需要考虑到多方面的因数. 
+			如果maxStatements与maxStatementsPerConnection均为0,则缓存被关闭。Default:0 -->
+		<property name="maxStatements" value="${order.jdbc.maxStatements}" />
+		<!-- 每60秒检查所有连接池中的空闲连接.Default:0 -->
+		<property name="idleConnectionTestPeriod" value="${order.jdbc.idleConnectionTestPeriod}" />
+	</bean>
+
+	<!-- mybatis配置 -->
+	<!-- 使用spring的会话管理 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="orderDataSource" />
+		<property name="mapperLocations" value="classpath*:mapper/**/*Mapper.xml" />
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+	</bean>
+
+	<!-- rabbitMq配置 -->
+	<!--配置connection-factory，指定连接rabbit server参数 -->
+	<rabbit:connection-factory id="connectionFactory"
+		username="${rabbitmq.username}" password="${rabbitmq.password}" host="${rabbitmq.host}"
+		port="${rabbitmq.port}" />
+
+	<!--定义rabbit template用于数据的接收和发送 -->
+	<rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"
+		exchange="schedule_exchange_test" />
+
+	<!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 -->
+	<rabbit:admin connection-factory="connectionFactory" />
+
+	<!--定义queue -->
+	<rabbit:queue name="schedule_queue_test" durable="true"
+		auto-delete="false" exclusive="false" />
+
+	<!-- 定义direct exchange，绑定queue -->
+	<rabbit:direct-exchange name="schedule_exchange_test"
+		durable="true" auto-delete="false">
+		<rabbit:bindings>
+			<rabbit:binding queue="schedule_queue_test" key="schedule"></rabbit:binding>
+		</rabbit:bindings>
+	</rabbit:direct-exchange>
+
+	<!-- 消息接收者 -->
+	<bean id="scheduleMsgReceiver" class="com.fzrj.schedule.server.ScheduleMsgReceiver"></bean>
+
+	<!-- queue listener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+	<!-- 消费者设置手动ack -->
+	<!-- 监听多队列用逗号分隔？ -->
+	<rabbit:listener-container
+		connection-factory="connectionFactory" acknowledge="manual">
+		<rabbit:listener queues="schedule_queue_test" ref="scheduleMsgReceiver" />
+	</rabbit:listener-container>
+
+	<!-- 创建SimpleMessageListenerContainer的理想通道，主要实现异常事件处理逻辑 -->
+	<bean id="retryOperationsInterceptorFactoryBean"
+		class="org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptorFactoryBean">
+		<property name="messageRecoverer">
+			<bean class="com.fzrj.schedule.server.MsgRecoverer" />
+		</property>
+		<property name="retryOperations">
+			<bean class="org.springframework.retry.support.RetryTemplate">
+				<property name="backOffPolicy">
+					<bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+						<property name="initialInterval" value="500" />
+						<property name="multiplier" value="10.0" />
+						<property name="maxInterval" value="10000" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.fzrj.module</groupId>
+	<artifactId>module_system</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>schedule_system</name>
+	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.3.0.RELEASE</version>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tomcat.version>7.0.64</tomcat.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-remoting</artifactId>
+			<version>2.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-web</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<!--rabbitmq依赖 -->
+		<dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit</artifactId>
+		</dependency>
+	</dependencies>
+
+	<!-- source，target，encoding指定了版本和编码 -->
+	<build>
+		<!-- source，target，encoding指定了版本和编码 -->
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<modules>
+		<module>schedule_bean</module>
+		<module>schedule_service</module>
+		<module>schedule_server</module>
+		<module>schedule_dao</module>
+		<module>routing_server</module>
+		<module>routing_bean</module>
+		<module>routing_dao</module>
+		<module>routing_service</module>
+		<module>push_bean</module>
+		<module>push_dao</module>
+		<module>push_service</module>
+		<module>push_server</module>
+    <module>sms_bean</module>
+    <module>sms_dao</module>
+    <module>sms_service</module>
+    <module>sms_server</module>
+  </modules>
+</project>
