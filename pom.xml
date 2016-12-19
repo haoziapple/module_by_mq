@@ -96,5 +96,6 @@
     <module>sms_dao</module>
     <module>sms_service</module>
     <module>sms_server</module>
+    <module>schedule_client</module>
   </modules>
 </project>

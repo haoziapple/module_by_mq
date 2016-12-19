@@ -111,51 +111,63 @@
 		port="${rabbitmq.port}" />
 
 	<!--定义rabbit template用于数据的接收和发送 -->
-	<rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"
-		exchange="schedule_exchange_test" />
+	<rabbit:template id="rabbitTemplate"
+		connection-factory="connectionFactory" exchange="schedule_exchange_dev" />
 
 	<!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 -->
 	<rabbit:admin connection-factory="connectionFactory" />
 
 	<!--定义queue -->
-	<rabbit:queue name="schedule_queue_test" durable="true"
+	<rabbit:queue name="addHttpCronJob_queue_dev" durable="true"
+		auto-delete="false" exclusive="false" />
+	<rabbit:queue name="addHttpSimpleJob_queue_dev" durable="true"
+		auto-delete="false" exclusive="false" />
+	<rabbit:queue name="deleteJob_queue_dev" durable="true"
 		auto-delete="false" exclusive="false" />
 
 	<!-- 定义direct exchange，绑定queue -->
-	<rabbit:direct-exchange name="schedule_exchange_test"
+	<rabbit:direct-exchange name="schedule_exchange_dev"
 		durable="true" auto-delete="false">
 		<rabbit:bindings>
-			<rabbit:binding queue="schedule_queue_test" key="schedule"></rabbit:binding>
+			<rabbit:binding queue="addHttpCronJob_queue_dev" key="addHttpCronJob"></rabbit:binding>
+			<rabbit:binding queue="addHttpSimpleJob_queue_dev" key="addHttpSimpleJob"></rabbit:binding>
+			<rabbit:binding queue="deleteJob_queue_dev" key="deleteJob"></rabbit:binding>
 		</rabbit:bindings>
 	</rabbit:direct-exchange>
 
 	<!-- 消息接收者 -->
-	<bean id="scheduleMsgReceiver" class="com.fzrj.schedule.server.ScheduleMsgReceiver"></bean>
+	<bean id="addHttpCronJobReceiver" class="com.fzrj.schedule.server.AddHttpCronJobReceiver"></bean>
+	<bean id="addHttpSimpleJobReceiver" class="com.fzrj.schedule.server.AddHttpSimpleJobReceiver"></bean>
+	<bean id="deleteJobReceiver" class="com.fzrj.schedule.server.DeleteJobReceiver"></bean>
 
 	<!-- queue listener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
 	<!-- 消费者设置手动ack -->
 	<!-- 监听多队列用逗号分隔？ -->
 	<rabbit:listener-container
 		connection-factory="connectionFactory" acknowledge="manual">
-		<rabbit:listener queues="schedule_queue_test" ref="scheduleMsgReceiver" />
+		<rabbit:listener queues="addHttpCronJob_queue_dev"
+			ref="addHttpCronJobReceiver" />
+		<rabbit:listener queues="addHttpSimpleJob_queue_dev"
+			ref="addHttpSimpleJobReceiver" />
+		<rabbit:listener queues="deleteJob_queue_dev" ref="deleteJobReceiver" />
 	</rabbit:listener-container>
 
-	<!-- 创建SimpleMessageListenerContainer的理想通道，主要实现异常事件处理逻辑 -->
-	<bean id="retryOperationsInterceptorFactoryBean"
-		class="org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptorFactoryBean">
-		<property name="messageRecoverer">
-			<bean class="com.fzrj.schedule.server.MsgRecoverer" />
-		</property>
-		<property name="retryOperations">
-			<bean class="org.springframework.retry.support.RetryTemplate">
-				<property name="backOffPolicy">
-					<bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
-						<property name="initialInterval" value="500" />
-						<property name="multiplier" value="10.0" />
-						<property name="maxInterval" value="10000" />
-					</bean>
-				</property>
-			</bean>
-		</property>
-	</bean>
+	<!-- 实现异常事件处理逻辑(没理解内在机制，暂时不启用) -->
+<!-- 	<bean id="retryOperationsInterceptorFactoryBean" -->
+<!-- 		class="org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptorFactoryBean"> -->
+<!-- 		<property name="messageRecoverer"> -->
+<!-- 			<bean class="com.fzrj.schedule.server.MsgRecoverer" /> -->
+<!-- 		</property> -->
+<!-- 		<property name="retryOperations"> -->
+<!-- 			<bean class="org.springframework.retry.support.RetryTemplate"> -->
+<!-- 				<property name="backOffPolicy"> -->
+<!-- 					<bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy"> -->
+<!-- 						<property name="initialInterval" value="500" /> -->
+<!-- 						<property name="multiplier" value="10.0" /> -->
+<!-- 						<property name="maxInterval" value="10000" /> -->
+<!-- 					</bean> -->
+<!-- 				</property> -->
+<!-- 			</bean> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
 </beans>
