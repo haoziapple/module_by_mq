@@ -16,16 +16,21 @@ public class AddHttpCronBean
 
 	private JobBean jobBean;
 
+	/**
+	 * 是否覆盖，true将先尝试删除原有定时任务
+	 */
 	private boolean overWrite;
+
+	public AddHttpCronBean(CronHttpReq cronHttpReq, JobBean jobBean, boolean overWrite)
+	{
+		this.cronHttpReq = cronHttpReq;
+		this.jobBean = jobBean;
+		this.overWrite = overWrite;
+	}
 
 	public CronHttpReq getCronHttpReq()
 	{
 		return cronHttpReq;
-	}
-
-	public void setCronHttpReq(CronHttpReq cronHttpReq)
-	{
-		this.cronHttpReq = cronHttpReq;
 	}
 
 	public JobBean getJobBean()
@@ -33,19 +38,9 @@ public class AddHttpCronBean
 		return jobBean;
 	}
 
-	public void setJobBean(JobBean jobBean)
-	{
-		this.jobBean = jobBean;
-	}
-
 	public boolean isOverWrite()
 	{
 		return overWrite;
-	}
-
-	public void setOverWrite(boolean overWrite)
-	{
-		this.overWrite = overWrite;
 	}
 
 	@Override

@@ -28,16 +28,26 @@ public class AddHttpCronJobReceiver implements ChannelAwareMessageListener
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception
 	{
-		String msg = new String(message.getBody(), "UTF-8");
-		logger.debug("添加Cron类型Http定时任务消息接收msg:" + msg);
-		ObjectMapper mapper = new ObjectMapper(); // 转换器
-		AddHttpCronBean addHttpCronBean = mapper.readValue(msg, AddHttpCronBean.class);
-		int result = scheduleService.addHttpCronJob(addHttpCronBean.getCronHttpReq(), addHttpCronBean.getJobBean(),
-				addHttpCronBean.isOverWrite());
-		if (0 == result)
+		AddHttpCronBean addHttpCronBean = null;
+		try
+		{
+			String msg = new String(message.getBody(), "UTF-8");
+			logger.debug("添加Cron类型Http定时任务消息接收msg:" + msg);
+			ObjectMapper mapper = new ObjectMapper(); // 转换器
+			addHttpCronBean = mapper.readValue(msg, AddHttpCronBean.class);
+		}
+		catch (Exception e)
+		{
+			logger.error("添加Cron类型Http定时任务,请求非法", e);
+			return;
+		}
+		finally
 		{
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		}
+		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
+		scheduleService.addHttpCronJob(addHttpCronBean.getCronHttpReq(), addHttpCronBean.getJobBean(),
+				addHttpCronBean.isOverWrite());
 	}
 
 }

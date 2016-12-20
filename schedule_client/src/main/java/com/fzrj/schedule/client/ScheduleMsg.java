@@ -20,13 +20,15 @@ import com.rabbitmq.client.MessageProperties;
  */
 public class ScheduleMsg
 {
-	private static String exchangeName = "schedule_exchange_dev";
+	private static final String EXCHANGE_NAME = "schedule_exchange" + "_" + MqConnectionFactory.ENV;
 
-	private static final String ADD_HTTP_CRON_JOB_KEY = "addHttpCronJob";
+	private static final String ADD_HTTP_CRON_JOB_KEY = "addHttpCronJob" + "_" + MqConnectionFactory.ENV + "_"
+			+ MqConnectionFactory.KEY;
 
-	private static final String ADD_HTTP_SIMPLE_JOB_KEY = "addHttpSimpleJob";
+	private static String ADD_HTTP_SIMPLE_JOB_KEY = "addHttpSimpleJob" + "_" + MqConnectionFactory.ENV + "_"
+			+ MqConnectionFactory.KEY;
 
-	private static final String DELETE_JOB_KEY = "deleteJob";
+	private static String DELETE_JOB_KEY = "deleteJob" + "_" + MqConnectionFactory.ENV + "_" + MqConnectionFactory.KEY;
 
 	/**
 	 * 添加Cron类型的Http定时任务
@@ -38,7 +40,7 @@ public class ScheduleMsg
 		// 发送消息
 		Connection connection = MqConnectionFactory.getInstance().newConnection();
 		Channel channel = connection.createChannel();
-		channel.basicPublish(exchangeName, ADD_HTTP_CRON_JOB_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,
+		channel.basicPublish(EXCHANGE_NAME, ADD_HTTP_CRON_JOB_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,
 				reqStr.getBytes("UTF-8"));
 	}
 
@@ -52,7 +54,7 @@ public class ScheduleMsg
 		// 发送消息
 		Connection connection = MqConnectionFactory.getInstance().newConnection();
 		Channel channel = connection.createChannel();
-		channel.basicPublish(exchangeName, ADD_HTTP_SIMPLE_JOB_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,
+		channel.basicPublish(EXCHANGE_NAME, ADD_HTTP_SIMPLE_JOB_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,
 				reqStr.getBytes("UTF-8"));
 	}
 
@@ -66,7 +68,7 @@ public class ScheduleMsg
 		// 发送消息
 		Connection connection = MqConnectionFactory.getInstance().newConnection();
 		Channel channel = connection.createChannel();
-		channel.basicPublish(exchangeName, DELETE_JOB_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,
+		channel.basicPublish(EXCHANGE_NAME, DELETE_JOB_KEY, MessageProperties.PERSISTENT_TEXT_PLAIN,
 				reqStr.getBytes("UTF-8"));
 	}
 }

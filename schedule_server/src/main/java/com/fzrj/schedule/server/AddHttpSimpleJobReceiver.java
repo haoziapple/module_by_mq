@@ -28,16 +28,26 @@ public class AddHttpSimpleJobReceiver implements ChannelAwareMessageListener
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception
 	{
-		String msg = new String(message.getBody(), "UTF-8");
-		logger.debug("添加一般类型Http定时任务消息接收msg:" + msg);
-		ObjectMapper mapper = new ObjectMapper(); // 转换器
-		AddHttpSimpleBean addhttpSimpleBean = mapper.readValue(msg, AddHttpSimpleBean.class);
-		int result = scheduleService.addHttpSimpleJob(addhttpSimpleBean.getSimpleHttpReq(),
-				addhttpSimpleBean.getJobBean(), addhttpSimpleBean.isOverWrite());
-		if (0 == result)
+		AddHttpSimpleBean addhttpSimpleBean = null;
+		try
+		{
+			String msg = new String(message.getBody(), "UTF-8");
+			logger.debug("添加一般类型Http定时任务消息接收msg:" + msg);
+			ObjectMapper mapper = new ObjectMapper(); // 转换器
+			addhttpSimpleBean = mapper.readValue(msg, AddHttpSimpleBean.class);
+		}
+		catch (Exception e)
+		{
+			logger.error("添加一般类型Http定时任务,请求非法", e);
+			return;
+		}
+		finally
 		{
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		}
+		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
+		scheduleService.addHttpSimpleJob(addhttpSimpleBean.getSimpleHttpReq(), addhttpSimpleBean.getJobBean(),
+				addhttpSimpleBean.isOverWrite());
 	}
 
 }

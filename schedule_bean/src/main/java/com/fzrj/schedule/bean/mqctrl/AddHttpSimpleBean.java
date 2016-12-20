@@ -18,14 +18,16 @@ public class AddHttpSimpleBean
 
 	private boolean overWrite;
 
+	public AddHttpSimpleBean(SimpleHttpReq simpleHttpReq, JobBean jobBean, boolean overWrite)
+	{
+		this.simpleHttpReq = simpleHttpReq;
+		this.jobBean = jobBean;
+		this.overWrite = overWrite;
+	}
+
 	public SimpleHttpReq getSimpleHttpReq()
 	{
 		return simpleHttpReq;
-	}
-
-	public void setSimpleHttpReq(SimpleHttpReq simpleHttpReq)
-	{
-		this.simpleHttpReq = simpleHttpReq;
 	}
 
 	public JobBean getJobBean()
@@ -33,19 +35,9 @@ public class AddHttpSimpleBean
 		return jobBean;
 	}
 
-	public void setJobBean(JobBean jobBean)
-	{
-		this.jobBean = jobBean;
-	}
-
 	public boolean isOverWrite()
 	{
 		return overWrite;
-	}
-
-	public void setOverWrite(boolean overWrite)
-	{
-		this.overWrite = overWrite;
 	}
 
 	@Override

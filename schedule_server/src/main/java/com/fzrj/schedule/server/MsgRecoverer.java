@@ -38,6 +38,8 @@ public class MsgRecoverer implements MessageRecoverer
 				message.getMessageProperties().getReceivedRoutingKey(), message);
 
 		logger.error("处理消息异常,重新发送,msg:" + new String(message.getBody()), cause);
+		
+		// TODO 重新入队一定次数后，说明此服务不可用，将发送告警并拒绝所有消息
 	}
 
 	/**

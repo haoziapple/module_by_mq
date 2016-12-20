@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.fzrj.module</groupId>
@@ -92,10 +93,10 @@
 		<module>push_dao</module>
 		<module>push_service</module>
 		<module>push_server</module>
-    <module>sms_bean</module>
-    <module>sms_dao</module>
-    <module>sms_service</module>
-    <module>sms_server</module>
-    <module>schedule_client</module>
-  </modules>
+		<module>sms_bean</module>
+		<module>sms_dao</module>
+		<module>sms_service</module>
+		<module>sms_server</module>
+		<module>schedule_client</module>
+	</modules>
 </project>

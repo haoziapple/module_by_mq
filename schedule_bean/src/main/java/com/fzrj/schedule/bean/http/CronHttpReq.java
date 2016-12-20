@@ -1,7 +1,5 @@
 package com.fzrj.schedule.bean.http;
 
-import java.util.Map;
-
 /**
  * @className:com.fzrj.schedule.bean.http.CronHttpReq
  * @description:Cron表达式的Http请求
@@ -11,9 +9,10 @@ import java.util.Map;
  */
 public class CronHttpReq extends HttpReqBean
 {
-	public CronHttpReq(String reqUrl, Map<String, String> head)
+	public CronHttpReq(String reqUrl, String reqBody, String cronExpression)
 	{
-		super(reqUrl, head);
+		super(reqUrl, reqBody);
+		this.cronExpression = cronExpression;
 	}
 
 	/**
@@ -24,10 +23,5 @@ public class CronHttpReq extends HttpReqBean
 	public String getCronExpression()
 	{
 		return cronExpression;
-	}
-
-	public void setCronExpression(String cronExpression)
-	{
-		this.cronExpression = cronExpression;
 	}
 }

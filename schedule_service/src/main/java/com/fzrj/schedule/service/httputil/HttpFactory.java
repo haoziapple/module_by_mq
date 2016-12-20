@@ -134,6 +134,9 @@ public class HttpFactory
 	public static void setDefaultHttpHead(HttpURLConnection httpURLConnection, HttpReqBean httpReq)
 			throws UnsupportedEncodingException, ProtocolException
 	{
+		// TODO 发送POST请求必须设置如下两行?
+		httpURLConnection.setDoOutput(true);// 打开输出流，以便向服务器提交数据
+		httpURLConnection.setDoInput(true);// 打开输入流，以便从服务器获取数据
 		// 设置通用请求属性
 		if (HttpConstant.METHOD.GET.equals(httpReq.getReqMethod()))
 		{
@@ -142,9 +145,6 @@ public class HttpFactory
 		else
 		{
 			httpURLConnection.setRequestMethod("POST");// 设置以POST方式提交数据
-			// 发送POST请求必须设置如下两行
-			httpURLConnection.setDoOutput(true);// 打开输出流，以便向服务器提交数据
-			httpURLConnection.setDoInput(true);// 打开输入流，以便从服务器获取数据
 			// Post请求不能使用缓存
 			httpURLConnection.setUseCaches(false);
 		}

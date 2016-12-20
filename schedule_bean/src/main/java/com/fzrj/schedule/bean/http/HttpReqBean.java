@@ -1,5 +1,6 @@
 package com.fzrj.schedule.bean.http;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fzrj.schedule.constant.HttpConstant;
@@ -21,13 +22,13 @@ public class HttpReqBean
 	/**
 	 * 请求头
 	 */
-	private Map<String, String> headMap;
+	private Map<String, String> headMap=new HashMap<String, String>();
 
-	public HttpReqBean(String reqUrl, Map<String, String> head)
+	public HttpReqBean(String reqUrl, String reqBody)
 	{
 		super();
 		this.reqUrl = reqUrl;
-		this.headMap = head;
+		this.reqBody = reqBody;
 	}
 
 	/**

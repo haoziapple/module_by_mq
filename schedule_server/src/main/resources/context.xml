@@ -35,6 +35,10 @@
 		</mvc:message-converters>
 	</mvc:annotation-driven>
 
+	<!-- 获取spring上下文工具类 -->
+	<bean id="springContextUtil" class="com.fzrj.schedule.service.SpringContextUtil"
+		scope="singleton" />
+
 	<!-- scheduler配置 -->
 	<bean name="scheduler"
 		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -65,6 +69,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath:db.properties</value>
+				<value>classpath:mq.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -112,62 +117,81 @@
 
 	<!--定义rabbit template用于数据的接收和发送 -->
 	<rabbit:template id="rabbitTemplate"
-		connection-factory="connectionFactory" exchange="schedule_exchange_dev" />
+		connection-factory="connectionFactory" exchange="schedule_exchange_${rabbitmq.env}" />
 
 	<!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 -->
 	<rabbit:admin connection-factory="connectionFactory" />
 
 	<!--定义queue -->
-	<rabbit:queue name="addHttpCronJob_queue_dev" durable="true"
+	<rabbit:queue id="addHttpCronJobQueue"
+		name="addHttpCronJob_queue_${rabbitmq.env}_${rabbitmq.server.key}"
+		durable="true" auto-delete="false" exclusive="false" />
+	<rabbit:queue id="addHttpSimpleJobQueue"
+		name="addHttpSimpleJob_queue_${rabbitmq.env}_${rabbitmq.server.key}"
+		durable="true" auto-delete="false" exclusive="false" />
+	<rabbit:queue id="deleteJobQueue"
+		name="deleteJob_queue_${rabbitmq.env}_${rabbitmq.server.key}" durable="true"
 		auto-delete="false" exclusive="false" />
-	<rabbit:queue name="addHttpSimpleJob_queue_dev" durable="true"
-		auto-delete="false" exclusive="false" />
-	<rabbit:queue name="deleteJob_queue_dev" durable="true"
-		auto-delete="false" exclusive="false" />
+	<rabbit:queue id="haoziDemoQueue" name="haozi_demo_queue"
+		durable="true" auto-delete="false" exclusive="false" />
 
 	<!-- 定义direct exchange，绑定queue -->
-	<rabbit:direct-exchange name="schedule_exchange_dev"
+	<rabbit:direct-exchange name="schedule_exchange_${rabbitmq.env}"
 		durable="true" auto-delete="false">
 		<rabbit:bindings>
-			<rabbit:binding queue="addHttpCronJob_queue_dev" key="addHttpCronJob"></rabbit:binding>
-			<rabbit:binding queue="addHttpSimpleJob_queue_dev" key="addHttpSimpleJob"></rabbit:binding>
-			<rabbit:binding queue="deleteJob_queue_dev" key="deleteJob"></rabbit:binding>
+			<rabbit:binding queue="addHttpCronJobQueue"
+				key="addHttpCronJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
+			<rabbit:binding queue="addHttpSimpleJobQueue"
+				key="addHttpSimpleJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
+			<rabbit:binding queue="deleteJobQueue"
+				key="deleteJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
+			<rabbit:binding queue="haoziDemoQueue" key="haozi_demo"></rabbit:binding>
 		</rabbit:bindings>
 	</rabbit:direct-exchange>
+
+	<!-- queue listener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+	<!-- 消费者设置手动ack -->
+	<!-- advice-chain:设置有异常抛出时的处理类 -->
+	<!-- 监听多队列用逗号分隔？ -->
+	<rabbit:listener-container
+		connection-factory="connectionFactory" acknowledge="manual"
+		advice-chain="retryOperationsInterceptorFactoryBean" concurrency="10"
+		prefetch="1">
+		<rabbit:listener queues="addHttpCronJobQueue" ref="addHttpCronJobReceiver" />
+		<rabbit:listener queues="addHttpSimpleJobQueue" ref="addHttpSimpleJobReceiver" />
+		<rabbit:listener queues="deleteJobQueue" ref="deleteJobReceiver" />
+		<rabbit:listener queues="haoziDemoQueue" ref="msgReceiver" />
+	</rabbit:listener-container>
 
 	<!-- 消息接收者 -->
 	<bean id="addHttpCronJobReceiver" class="com.fzrj.schedule.server.AddHttpCronJobReceiver"></bean>
 	<bean id="addHttpSimpleJobReceiver" class="com.fzrj.schedule.server.AddHttpSimpleJobReceiver"></bean>
 	<bean id="deleteJobReceiver" class="com.fzrj.schedule.server.DeleteJobReceiver"></bean>
+	<bean id="msgReceiver" class="com.fzrj.schedule.server.ScheduleMsgReceiver"></bean>
 
-	<!-- queue listener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
-	<!-- 消费者设置手动ack -->
-	<!-- 监听多队列用逗号分隔？ -->
-	<rabbit:listener-container
-		connection-factory="connectionFactory" acknowledge="manual">
-		<rabbit:listener queues="addHttpCronJob_queue_dev"
-			ref="addHttpCronJobReceiver" />
-		<rabbit:listener queues="addHttpSimpleJob_queue_dev"
-			ref="addHttpSimpleJobReceiver" />
-		<rabbit:listener queues="deleteJob_queue_dev" ref="deleteJobReceiver" />
-	</rabbit:listener-container>
-
-	<!-- 实现异常事件处理逻辑(没理解内在机制，暂时不启用) -->
-<!-- 	<bean id="retryOperationsInterceptorFactoryBean" -->
-<!-- 		class="org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptorFactoryBean"> -->
-<!-- 		<property name="messageRecoverer"> -->
-<!-- 			<bean class="com.fzrj.schedule.server.MsgRecoverer" /> -->
-<!-- 		</property> -->
-<!-- 		<property name="retryOperations"> -->
-<!-- 			<bean class="org.springframework.retry.support.RetryTemplate"> -->
-<!-- 				<property name="backOffPolicy"> -->
-<!-- 					<bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy"> -->
-<!-- 						<property name="initialInterval" value="500" /> -->
-<!-- 						<property name="multiplier" value="10.0" /> -->
-<!-- 						<property name="maxInterval" value="10000" /> -->
-<!-- 					</bean> -->
-<!-- 				</property> -->
-<!-- 			</bean> -->
-<!-- 		</property> -->
-<!-- 	</bean> -->
+	<!-- 实现异常事件处理逻辑 -->
+	<bean id="retryOperationsInterceptorFactoryBean"
+		class="org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptorFactoryBean">
+		<!-- 重试失败后消息恢复类 -->
+		<property name="messageRecoverer">
+			<bean class="com.fzrj.schedule.server.MsgRecoverer" />
+		</property>
+		<!-- 出现异常时的操作策略策略 -->
+		<property name="retryOperations">
+			<bean class="org.springframework.retry.support.RetryTemplate">
+				<property name="backOffPolicy"><!-- 补偿策略 -->
+					<bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+						<property name="initialInterval" value="10000" /><!-- 失败后首次重试间隔 -->
+						<property name="multiplier" value="1.01" /><!-- 重试间隔的增长系数 -->
+						<property name="maxInterval" value="30000" /><!-- 最大重试间隔 -->
+					</bean>
+				</property>
+				<property name="retryPolicy"><!-- 重试策略 -->
+					<bean class="org.springframework.retry.policy.SimpleRetryPolicy">
+						<property name="maxAttempts" value="4" /><!-- 最大重试次数 -->
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
 </beans>

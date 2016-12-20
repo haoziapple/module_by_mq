@@ -28,15 +28,25 @@ public class DeleteJobReceiver implements ChannelAwareMessageListener
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception
 	{
-		String msg = new String(message.getBody(), "UTF-8");
-		logger.debug("删除定时任务消息接收msg:" + msg);
-		ObjectMapper mapper = new ObjectMapper(); // 转换器
-		JobBean jobBean = mapper.readValue(msg, JobBean.class);
-		int result = scheduleService.deleteJob(jobBean);
-		if (0 == result)
+		JobBean jobBean = null;
+		try
+		{
+			String msg = new String(message.getBody(), "UTF-8");
+			logger.debug("删除定时任务消息接收msg:" + msg);
+			ObjectMapper mapper = new ObjectMapper(); // 转换器
+			jobBean = mapper.readValue(msg, JobBean.class);
+		}
+		catch (Exception e)
+		{
+			logger.error("删除定时任务,请求非法", e);
+			return;
+		}
+		finally
 		{
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		}
+		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
+		scheduleService.deleteJob(jobBean);
 	}
 
 }

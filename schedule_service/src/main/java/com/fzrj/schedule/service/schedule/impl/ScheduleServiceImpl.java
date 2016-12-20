@@ -44,7 +44,7 @@ public class ScheduleServiceImpl implements ScheduleService
 	private Scheduler scheduler;
 
 	@Override
-	public int addHttpCronJob(CronHttpReq cronHttpReq, JobBean jobBean, boolean overWrite)
+	public int addHttpCronJob(CronHttpReq cronHttpReq, JobBean jobBean, boolean overWrite) throws SchedulerException
 	{
 		if (overWrite)
 		{
@@ -65,18 +65,19 @@ public class ScheduleServiceImpl implements ScheduleService
 		}
 		catch (SchedulerException e)
 		{
-			logger.error("添加cron类型的Http请求定时任务异常", e);
-			return -1;
+			throw e;
 		}
 	}
 
 	@Override
-	public int addHttpSimpleJob(SimpleHttpReq simpleHttpReq, JobBean jobBean, boolean overWrite)
+	public int addHttpSimpleJob(SimpleHttpReq simpleHttpReq, JobBean jobBean, boolean overWrite) throws SchedulerException
 	{
 		if (overWrite)
 		{
 			this.deleteJob(jobBean);// 覆盖原有定时任务，先删除
 		}
+		// 计算任务开始时间,如果设置了pendTime的话
+		simpleHttpReq.calculateStartTime();
 		logger.debug("添加一般类型的Http请求定时任务" + simpleHttpReq + jobBean);
 		// 设定job参数map
 		jobBean.setMap(this.getHttpJobMap(simpleHttpReq));
@@ -96,13 +97,12 @@ public class ScheduleServiceImpl implements ScheduleService
 		}
 		catch (SchedulerException e)
 		{
-			logger.error("添加一般类型的Http请求定时任务异常", e);
-			return -1;
+			throw e;
 		}
 	}
 
 	@Override
-	public int deleteJob(JobBean jobBean)
+	public int deleteJob(JobBean jobBean) throws SchedulerException
 	{
 		logger.debug("删除定时任务" + jobBean);
 		try
@@ -114,8 +114,7 @@ public class ScheduleServiceImpl implements ScheduleService
 		}
 		catch (SchedulerException e)
 		{
-			logger.error("删除定时任务异常", e);
-			return -1;
+			throw e;
 		}
 	}
 

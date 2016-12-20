@@ -31,12 +31,18 @@ public class JobBean
 	 */
 	private Map<String, String> map;
 
-	public JobBean(String jobName, String groupName, String triggerName)
+	/**
+	 * 通过平台名platName与jobKey确定一个定时任务，同一平台里jobKey唯一
+	 * 
+	 * @param jobKey--
+	 * @param platName
+	 */
+	public JobBean(String jobKey, String platName)
 	{
 		super();
-		this.jobName = jobName;
-		this.groupName = groupName;
-		this.triggerName = triggerName;
+		this.jobName = jobKey;
+		this.groupName = platName;
+		this.triggerName = jobKey;
 	}
 
 	public Map<String, String> getMap()

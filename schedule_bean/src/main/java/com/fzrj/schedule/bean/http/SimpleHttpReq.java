@@ -1,7 +1,6 @@
 package com.fzrj.schedule.bean.http;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @className:com.fzrj.schedule.bean.http.SimpleHttpReq
@@ -12,10 +11,72 @@ import java.util.Map;
  */
 public class SimpleHttpReq extends HttpReqBean
 {
-	public SimpleHttpReq(String reqUrl, Map<String, String> head)
+	/**
+	 * 默认不重试
+	 */
+	public SimpleHttpReq(String reqUrl, String reqBody, Date startTime)
 	{
-		super(reqUrl, head);
+		super(reqUrl, reqBody);
+		this.startTime = startTime;
+		this.repeatInterval = 1L;
+		Date endDate = new Date();
+		endDate.setTime(startTime.getTime() + 10000L);
+		this.endTime = endDate;
 	}
+
+	public SimpleHttpReq(String reqUrl, String reqBody, Date startTime, int repeatCount, long repeatInterval)
+	{
+		super(reqUrl, reqBody);
+		this.startTime = startTime;
+		this.repeatCount = repeatCount;
+		this.repeatInterval = repeatInterval;
+		this.endTime = new Date();
+		this.endTime.setTime(startTime.getTime() + repeatCount * repeatInterval + 10000L);
+	}
+
+	/**
+	 * 等待一段时间后执行任务
+	 * 
+	 * @param reqUrl
+	 * @param reqBody
+	 * @param pendTime
+	 */
+	public SimpleHttpReq(String reqUrl, String reqBody, long pendTime)
+	{
+		super(reqUrl, reqBody);
+		this.pendTime = pendTime;
+	}
+
+	public SimpleHttpReq(String reqUrl, String reqBody, long pendTime, int repeatCount, long repeatInterval)
+	{
+		super(reqUrl, reqBody);
+		this.pendTime = pendTime;
+		this.repeatCount = repeatCount;
+		this.repeatInterval = repeatInterval;
+	}
+
+	/**
+	 * @Description:根据等待时间计算任务时间
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2016年12月20日 下午8:27:50
+	 */
+	public void calculateStartTime()
+	{
+		if (this.pendTime != 0)
+		{
+			Date nowDate = new Date();
+			startTime = new Date();
+			startTime.setTime(nowDate.getTime() + pendTime);
+			this.endTime = new Date();
+			this.endTime.setTime(startTime.getTime() + repeatCount * repeatInterval + 10000L);
+		}
+	}
+
+	/**
+	 * 等待时间
+	 */
+	private long pendTime = 0;
 
 	/**
 	 * 开始执行时间
@@ -35,16 +96,11 @@ public class SimpleHttpReq extends HttpReqBean
 	/**
 	 * 重复执行间隔(毫秒)
 	 */
-	private long repeatInterval;
+	private long repeatInterval = 0;
 
 	public Date getStartTime()
 	{
 		return startTime;
-	}
-
-	public void setStartTime(Date startTime)
-	{
-		this.startTime = startTime;
 	}
 
 	public Date getEndTime()
@@ -52,19 +108,9 @@ public class SimpleHttpReq extends HttpReqBean
 		return endTime;
 	}
 
-	public void setEndTime(Date endTime)
-	{
-		this.endTime = endTime;
-	}
-
 	public int getRepeatCount()
 	{
 		return repeatCount;
-	}
-
-	public void setRepeatCount(int repeatCount)
-	{
-		this.repeatCount = repeatCount;
 	}
 
 	public long getRepeatInterval()
@@ -72,8 +118,9 @@ public class SimpleHttpReq extends HttpReqBean
 		return repeatInterval;
 	}
 
-	public void setRepeatInterval(long repeatInterval)
+	public long getPendTime()
 	{
-		this.repeatInterval = repeatInterval;
+		return pendTime;
 	}
+
 }
