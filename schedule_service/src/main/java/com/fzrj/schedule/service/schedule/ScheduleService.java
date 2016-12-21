@@ -2,9 +2,10 @@ package com.fzrj.schedule.service.schedule;
 
 import org.quartz.SchedulerException;
 
-import com.fzrj.schedule.bean.http.CronHttpReq;
-import com.fzrj.schedule.bean.http.SimpleHttpReq;
+import com.fzrj.schedule.bean.http.HttpReqBean;
+import com.fzrj.schedule.bean.job.CronJobBean;
 import com.fzrj.schedule.bean.job.JobBean;
+import com.fzrj.schedule.bean.job.SimpleJobBean;
 
 /**
  * @className:com.fzrj.schedule.service.schedule.ScheduleService
@@ -23,7 +24,7 @@ public interface ScheduleService
 	 * @author:WangHao
 	 * @date:2016年12月16日 下午2:22:12
 	 */
-	int addHttpCronJob(CronHttpReq cronHttpReq, JobBean jobBean, boolean overWrite) throws SchedulerException;
+	int addHttpCronJob(HttpReqBean httpReqBean, CronJobBean cronJobBean, boolean overWrite) throws SchedulerException;
 
 	/**
 	 * @Description:添加一般类型的Http请求定时任务
@@ -31,7 +32,7 @@ public interface ScheduleService
 	 * @author:WangHao
 	 * @date:2016年12月16日 下午2:25:10
 	 */
-	int addHttpSimpleJob(SimpleHttpReq simpleHttpReq, JobBean jobBean, boolean overWrite) throws SchedulerException;
+	int addHttpSimpleJob(HttpReqBean httpReqBean, SimpleJobBean simpleJobBean, boolean overWrite) throws SchedulerException;
 
 	/**
 	 * @Description:删除定时任务

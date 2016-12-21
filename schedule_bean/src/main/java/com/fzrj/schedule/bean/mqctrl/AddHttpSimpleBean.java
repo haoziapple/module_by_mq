@@ -1,7 +1,9 @@
 package com.fzrj.schedule.bean.mqctrl;
 
+import com.fzrj.schedule.bean.http.HttpReqBean;
 import com.fzrj.schedule.bean.http.SimpleHttpReq;
 import com.fzrj.schedule.bean.job.JobBean;
+import com.fzrj.schedule.bean.job.SimpleJobBean;
 
 /**
  * @className:com.fzrj.schedule.bean.mqctrl.AddHttpSimpleBean
@@ -12,27 +14,17 @@ import com.fzrj.schedule.bean.job.JobBean;
  */
 public class AddHttpSimpleBean
 {
-	private SimpleHttpReq simpleHttpReq;
+	private HttpReqBean httpReqBean;
 
-	private JobBean jobBean;
+	private SimpleJobBean simpleJobBean;
 
 	private boolean overWrite;
 
-	public AddHttpSimpleBean(SimpleHttpReq simpleHttpReq, JobBean jobBean, boolean overWrite)
+	public AddHttpSimpleBean(HttpReqBean httpReqBean, SimpleJobBean simpleJobBean, boolean overWrite)
 	{
-		this.simpleHttpReq = simpleHttpReq;
-		this.jobBean = jobBean;
+		this.httpReqBean = httpReqBean;
+		this.simpleJobBean = simpleJobBean;
 		this.overWrite = overWrite;
-	}
-
-	public SimpleHttpReq getSimpleHttpReq()
-	{
-		return simpleHttpReq;
-	}
-
-	public JobBean getJobBean()
-	{
-		return jobBean;
 	}
 
 	public boolean isOverWrite()
@@ -40,10 +32,20 @@ public class AddHttpSimpleBean
 		return overWrite;
 	}
 
+	public HttpReqBean getHttpReqBean()
+	{
+		return httpReqBean;
+	}
+
+	public SimpleJobBean getSimpleJobBean()
+	{
+		return simpleJobBean;
+	}
+
 	@Override
 	public String toString()
 	{
-		return "AddHttpSimpleBean [simpleHttpReq=" + simpleHttpReq + ", jobBean=" + jobBean + ", overWrite=" + overWrite
-				+ "]";
+		return "AddHttpSimpleBean [httpReqBean=" + httpReqBean + ", simpleJobBean=" + simpleJobBean + ", overWrite="
+				+ overWrite + "]";
 	}
 }

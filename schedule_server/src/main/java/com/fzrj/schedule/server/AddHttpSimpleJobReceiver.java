@@ -46,7 +46,7 @@ public class AddHttpSimpleJobReceiver implements ChannelAwareMessageListener
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		}
 		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
-		scheduleService.addHttpSimpleJob(addhttpSimpleBean.getSimpleHttpReq(), addhttpSimpleBean.getJobBean(),
+		scheduleService.addHttpSimpleJob(addhttpSimpleBean.getHttpReqBean(), addhttpSimpleBean.getSimpleJobBean(),
 				addhttpSimpleBean.isOverWrite());
 	}
 

@@ -46,7 +46,7 @@ public class AddHttpCronJobReceiver implements ChannelAwareMessageListener
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		}
 		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
-		scheduleService.addHttpCronJob(addHttpCronBean.getCronHttpReq(), addHttpCronBean.getJobBean(),
+		scheduleService.addHttpCronJob(addHttpCronBean.getHttpReqBean(), addHttpCronBean.getCronJobBean(),
 				addHttpCronBean.isOverWrite());
 	}
 

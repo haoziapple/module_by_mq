@@ -22,10 +22,10 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fzrj.schedule.bean.http.CronHttpReq;
 import com.fzrj.schedule.bean.http.HttpReqBean;
-import com.fzrj.schedule.bean.http.SimpleHttpReq;
+import com.fzrj.schedule.bean.job.CronJobBean;
 import com.fzrj.schedule.bean.job.JobBean;
+import com.fzrj.schedule.bean.job.SimpleJobBean;
 import com.fzrj.schedule.service.job.HttpJob;
 import com.fzrj.schedule.service.schedule.ScheduleService;
 
@@ -44,20 +44,20 @@ public class ScheduleServiceImpl implements ScheduleService
 	private Scheduler scheduler;
 
 	@Override
-	public int addHttpCronJob(CronHttpReq cronHttpReq, JobBean jobBean, boolean overWrite) throws SchedulerException
+	public int addHttpCronJob(HttpReqBean httpReqBean, CronJobBean cronJobBean, boolean overWrite) throws SchedulerException
 	{
 		if (overWrite)
 		{
-			this.deleteJob(jobBean);// 覆盖原有定时任务，先删除
+			this.deleteJob(cronJobBean);// 覆盖原有定时任务，先删除
 		}
-		logger.debug("添加cron类型的Http请求定时任务" + cronHttpReq + jobBean);
+		logger.debug("添加cron类型的Http请求定时任务" + httpReqBean + cronJobBean);
 		// 设定job参数map
-		jobBean.setMap(this.getHttpJobMap(cronHttpReq));
+		cronJobBean.setMap(this.getHttpJobMap(httpReqBean));
 		// 创建JobDetail
-		JobDetail jobDetail = this.createHttpJob(jobBean);
+		JobDetail jobDetail = this.createHttpJob(cronJobBean);
 		// 创建trigger
-		CronTrigger trigger = (CronTrigger) TriggerBuilder.newTrigger().withIdentity(jobBean.getTriggerName())
-				.withSchedule(CronScheduleBuilder.cronSchedule(cronHttpReq.getCronExpression())).build();
+		CronTrigger trigger = (CronTrigger) TriggerBuilder.newTrigger().withIdentity(cronJobBean.getTriggerName())
+				.withSchedule(CronScheduleBuilder.cronSchedule(cronJobBean.getCronExpression())).build();
 		try
 		{
 			scheduler.scheduleJob(jobDetail, trigger);
@@ -70,25 +70,25 @@ public class ScheduleServiceImpl implements ScheduleService
 	}
 
 	@Override
-	public int addHttpSimpleJob(SimpleHttpReq simpleHttpReq, JobBean jobBean, boolean overWrite) throws SchedulerException
+	public int addHttpSimpleJob(HttpReqBean httpReqBean, SimpleJobBean simpleJobBean, boolean overWrite) throws SchedulerException
 	{
 		if (overWrite)
 		{
-			this.deleteJob(jobBean);// 覆盖原有定时任务，先删除
+			this.deleteJob(simpleJobBean);// 覆盖原有定时任务，先删除
 		}
 		// 计算任务开始时间,如果设置了pendTime的话
-		simpleHttpReq.calculateStartTime();
-		logger.debug("添加一般类型的Http请求定时任务" + simpleHttpReq + jobBean);
+		simpleJobBean.calculateStartTime();
+		logger.debug("添加一般类型的Http请求定时任务" + httpReqBean + simpleJobBean);
 		// 设定job参数map
-		jobBean.setMap(this.getHttpJobMap(simpleHttpReq));
+		simpleJobBean.setMap(this.getHttpJobMap(httpReqBean));
 		// 创建JobDetail
-		JobDetail jobDetail = this.createHttpJob(jobBean);
+		JobDetail jobDetail = this.createHttpJob(simpleJobBean);
 		// 创建trigger
-		SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity(jobBean.getTriggerName())
-				.startAt(simpleHttpReq.getStartTime()).endAt(simpleHttpReq.getEndTime())
+		SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity(simpleJobBean.getTriggerName())
+				.startAt(simpleJobBean.getStartTime()).endAt(simpleJobBean.getEndTime())
 				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-						.withIntervalInMilliseconds(simpleHttpReq.getRepeatInterval())
-						.withRepeatCount(simpleHttpReq.getRepeatCount()))
+						.withIntervalInMilliseconds(simpleJobBean.getRepeatInterval())
+						.withRepeatCount(simpleJobBean.getRepeatCount()))
 				.build();
 		try
 		{

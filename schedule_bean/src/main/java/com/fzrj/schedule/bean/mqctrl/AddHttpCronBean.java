@@ -1,7 +1,7 @@
 package com.fzrj.schedule.bean.mqctrl;
 
-import com.fzrj.schedule.bean.http.CronHttpReq;
-import com.fzrj.schedule.bean.job.JobBean;
+import com.fzrj.schedule.bean.http.HttpReqBean;
+import com.fzrj.schedule.bean.job.CronJobBean;
 
 /**
  * @className:com.fzrj.schedule.bean.mqctrl.AddHttpCronBean
@@ -12,41 +12,42 @@ import com.fzrj.schedule.bean.job.JobBean;
  */
 public class AddHttpCronBean
 {
-	private CronHttpReq cronHttpReq;
+	private HttpReqBean httpReqBean;
 
-	private JobBean jobBean;
+	private CronJobBean cronJobBean;
 
 	/**
 	 * 是否覆盖，true将先尝试删除原有定时任务
 	 */
 	private boolean overWrite;
 
-	public AddHttpCronBean(CronHttpReq cronHttpReq, JobBean jobBean, boolean overWrite)
+	public AddHttpCronBean(HttpReqBean httpReqBean, CronJobBean cronJobBean, boolean overWrite)
 	{
-		this.cronHttpReq = cronHttpReq;
-		this.jobBean = jobBean;
+		this.httpReqBean = httpReqBean;
+		this.cronJobBean = cronJobBean;
 		this.overWrite = overWrite;
 	}
 
-	public CronHttpReq getCronHttpReq()
+	public HttpReqBean getHttpReqBean()
 	{
-		return cronHttpReq;
+		return httpReqBean;
 	}
 
-	public JobBean getJobBean()
-	{
-		return jobBean;
-	}
 
 	public boolean isOverWrite()
 	{
 		return overWrite;
 	}
 
+	public CronJobBean getCronJobBean()
+	{
+		return cronJobBean;
+	}
+
 	@Override
 	public String toString()
 	{
-		return "AddHttpCronBean [cronHttpReq=" + cronHttpReq + ", jobBean=" + jobBean + ", overWrite=" + overWrite
-				+ "]";
+		return "AddHttpCronBean [httpReqBean=" + httpReqBean + ", cronJobBean=" + cronJobBean + ", overWrite="
+				+ overWrite + "]";
 	}
 }
