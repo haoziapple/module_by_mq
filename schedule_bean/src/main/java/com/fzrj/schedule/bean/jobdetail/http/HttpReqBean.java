@@ -1,4 +1,4 @@
-package com.fzrj.schedule.bean.http;
+package com.fzrj.schedule.bean.jobdetail.http;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 import com.fzrj.schedule.constant.HttpConstant;
 
 /**
- * @className:com.fzrj.schedule.bean.http.HttpReqBean
+ * @className:com.fzrj.schedule.bean.jobdetail.http.HttpReqBean
  * @description:Http请求bean
  * @version:v1.0.0
  * @date:2016年11月23日 下午2:51:16
@@ -14,6 +14,16 @@ import com.fzrj.schedule.constant.HttpConstant;
  */
 public class HttpReqBean
 {
+	public static final String URL_KEY = "url";
+
+	public static final String BODY_KEY = "body";
+
+	public static final String METHOD_KEY = "method";
+
+	public static final String FORMAT_KEY = "format";
+
+	public static final String HEAD_KEY = "head";
+
 	/**
 	 * 请求url
 	 */
@@ -22,7 +32,7 @@ public class HttpReqBean
 	/**
 	 * 请求头
 	 */
-	private Map<String, String> headMap=new HashMap<String, String>();
+	private Map<String, String> headMap = new HashMap<String, String>();
 
 	public HttpReqBean(String reqUrl, String reqBody)
 	{

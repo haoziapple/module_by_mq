@@ -1,8 +1,5 @@
 package com.fzrj.schedule.service.schedule.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.CronScheduleBuilder;
@@ -20,13 +17,14 @@ import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fzrj.schedule.bean.http.HttpReqBean;
 import com.fzrj.schedule.bean.job.CronJobBean;
 import com.fzrj.schedule.bean.job.JobBean;
 import com.fzrj.schedule.bean.job.SimpleJobBean;
+import com.fzrj.schedule.bean.jobdetail.http.HttpReqBean;
+import com.fzrj.schedule.bean.jobdetail.mq.MqMsgBean;
+import com.fzrj.schedule.service.JobMapConverter;
 import com.fzrj.schedule.service.job.HttpJob;
+import com.fzrj.schedule.service.job.MqMsgJob;
 import com.fzrj.schedule.service.schedule.ScheduleService;
 
 /**
@@ -44,7 +42,8 @@ public class ScheduleServiceImpl implements ScheduleService
 	private Scheduler scheduler;
 
 	@Override
-	public int addHttpCronJob(HttpReqBean httpReqBean, CronJobBean cronJobBean, boolean overWrite) throws SchedulerException
+	public int addHttpCronJob(HttpReqBean httpReqBean, CronJobBean cronJobBean, boolean overWrite)
+			throws SchedulerException
 	{
 		if (overWrite)
 		{
@@ -52,11 +51,12 @@ public class ScheduleServiceImpl implements ScheduleService
 		}
 		logger.debug("添加cron类型的Http请求定时任务" + httpReqBean + cronJobBean);
 		// 设定job参数map
-		cronJobBean.setMap(this.getHttpJobMap(httpReqBean));
+		cronJobBean.setMap(JobMapConverter.getHttpJobMap(httpReqBean));
 		// 创建JobDetail
 		JobDetail jobDetail = this.createHttpJob(cronJobBean);
 		// 创建trigger
-		CronTrigger trigger = (CronTrigger) TriggerBuilder.newTrigger().withIdentity(cronJobBean.getTriggerName())
+		CronTrigger trigger = (CronTrigger) TriggerBuilder.newTrigger()
+				.withIdentity(cronJobBean.getTriggerName(), cronJobBean.getGroupName())
 				.withSchedule(CronScheduleBuilder.cronSchedule(cronJobBean.getCronExpression())).build();
 		try
 		{
@@ -70,7 +70,8 @@ public class ScheduleServiceImpl implements ScheduleService
 	}
 
 	@Override
-	public int addHttpSimpleJob(HttpReqBean httpReqBean, SimpleJobBean simpleJobBean, boolean overWrite) throws SchedulerException
+	public int addHttpSimpleJob(HttpReqBean httpReqBean, SimpleJobBean simpleJobBean, boolean overWrite)
+			throws SchedulerException
 	{
 		if (overWrite)
 		{
@@ -80,11 +81,12 @@ public class ScheduleServiceImpl implements ScheduleService
 		simpleJobBean.calculateStartTime();
 		logger.debug("添加一般类型的Http请求定时任务" + httpReqBean + simpleJobBean);
 		// 设定job参数map
-		simpleJobBean.setMap(this.getHttpJobMap(httpReqBean));
+		simpleJobBean.setMap(JobMapConverter.getHttpJobMap(httpReqBean));
 		// 创建JobDetail
 		JobDetail jobDetail = this.createHttpJob(simpleJobBean);
 		// 创建trigger
-		SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity(simpleJobBean.getTriggerName())
+		SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
+				.withIdentity(simpleJobBean.getTriggerName(), simpleJobBean.getGroupName())
 				.startAt(simpleJobBean.getStartTime()).endAt(simpleJobBean.getEndTime())
 				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
 						.withIntervalInMilliseconds(simpleJobBean.getRepeatInterval())
@@ -107,9 +109,9 @@ public class ScheduleServiceImpl implements ScheduleService
 		logger.debug("删除定时任务" + jobBean);
 		try
 		{
-			scheduler.pauseTrigger(new TriggerKey(jobBean.getTriggerName()));// 停止触发器
-			scheduler.unscheduleJob(new TriggerKey(jobBean.getTriggerName()));// 移除触发器
-			scheduler.deleteJob(new JobKey(jobBean.getJobName()));// 删除任务
+			scheduler.pauseTrigger(new TriggerKey(jobBean.getTriggerName(), jobBean.getGroupName()));// 停止触发器
+			scheduler.unscheduleJob(new TriggerKey(jobBean.getTriggerName(), jobBean.getGroupName()));// 移除触发器
+			scheduler.deleteJob(new JobKey(jobBean.getJobName(), jobBean.getGroupName()));// 删除任务
 			return 0;
 		}
 		catch (SchedulerException e)
@@ -118,30 +120,51 @@ public class ScheduleServiceImpl implements ScheduleService
 		}
 	}
 
-	/**
-	 * 获取Http定时Job的参数Map
-	 * 
-	 * @throws JsonProcessingException
-	 */
-	private Map<String, String> getHttpJobMap(HttpReqBean httpReqBean)
+	@Override
+	public void addMqCronJob(MqMsgBean mqMsgBean, CronJobBean cronJobBean, boolean overWrite) throws SchedulerException
 	{
-		// job参数Map
-		Map<String, String> jobMap = new HashMap<String, String>();
-		jobMap.put(HttpJob.URL_KEY, httpReqBean.getReqUrl());
-		jobMap.put(HttpJob.BODY_KEY, httpReqBean.getReqBody());
-		jobMap.put(HttpJob.METHOD_KEY, httpReqBean.getReqMethod());
-		jobMap.put(HttpJob.FORMAT_KEY, httpReqBean.getReqFormat());
-		// 定时Http的请求头map
-		ObjectMapper mapper = new ObjectMapper(); // 转换器
-		try
+		if (overWrite)
 		{
-			jobMap.put(HttpJob.HEAD_KEY, mapper.writeValueAsString(httpReqBean.getHeadMap()));
+			this.deleteJob(cronJobBean);// 覆盖原有定时任务，先删除
 		}
-		catch (JsonProcessingException e)
+		logger.debug("添加cron类型的Mq请求定时任务" + mqMsgBean + cronJobBean);
+		// 设定job参数map
+		cronJobBean.setMap(JobMapConverter.getMqJobMap(mqMsgBean));
+		// 创建JobDetail
+		JobDetail jobDetail = this.createMqJob(cronJobBean);
+		// 创建trigger
+		CronTrigger trigger = (CronTrigger) TriggerBuilder.newTrigger()
+				.withIdentity(cronJobBean.getTriggerName(), cronJobBean.getGroupName())
+				.withSchedule(CronScheduleBuilder.cronSchedule(cronJobBean.getCronExpression())).build();
+
+		scheduler.scheduleJob(jobDetail, trigger);
+	}
+
+	@Override
+	public void addMqSimpleJob(MqMsgBean mqMsgBean, SimpleJobBean simpleJobBean, boolean overWrite)
+			throws SchedulerException
+	{
+		if (overWrite)
 		{
-			logger.error("设定Http定时job,设置Http头异常", e);
+			this.deleteJob(simpleJobBean);// 覆盖原有定时任务，先删除
 		}
-		return jobMap;
+		// 计算任务开始时间,如果设置了pendTime的话
+		simpleJobBean.calculateStartTime();
+		logger.debug("添加一般类型的Mq请求定时任务" + mqMsgBean + simpleJobBean);
+		// 设定job参数map
+		simpleJobBean.setMap(JobMapConverter.getMqJobMap(mqMsgBean));
+		// 创建JobDetail
+		JobDetail jobDetail = this.createMqJob(simpleJobBean);
+		// 创建trigger
+		SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
+				.withIdentity(simpleJobBean.getTriggerName(), simpleJobBean.getGroupName())
+				.startAt(simpleJobBean.getStartTime()).endAt(simpleJobBean.getEndTime())
+				.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+						.withIntervalInMilliseconds(simpleJobBean.getRepeatInterval())
+						.withRepeatCount(simpleJobBean.getRepeatCount()))
+				.build();
+
+		scheduler.scheduleJob(jobDetail, simpleTrigger);
 	}
 
 	/**
@@ -150,6 +173,16 @@ public class ScheduleServiceImpl implements ScheduleService
 	private JobDetail createHttpJob(JobBean jobBean)
 	{
 		JobDetail job = JobBuilder.newJob(HttpJob.class).usingJobData(new JobDataMap(jobBean.getMap()))
+				.withIdentity(jobBean.getJobName(), jobBean.getGroupName()).build();
+		return job;
+	}
+
+	/**
+	 * 创建Mq定时Job
+	 */
+	private JobDetail createMqJob(JobBean jobBean)
+	{
+		JobDetail job = JobBuilder.newJob(MqMsgJob.class).usingJobData(new JobDataMap(jobBean.getMap()))
 				.withIdentity(jobBean.getJobName(), jobBean.getGroupName()).build();
 		return job;
 	}

@@ -1,9 +1,7 @@
 package com.fzrj.schedule.bean.mqctrl;
 
-import com.fzrj.schedule.bean.http.HttpReqBean;
-import com.fzrj.schedule.bean.http.SimpleHttpReq;
-import com.fzrj.schedule.bean.job.JobBean;
 import com.fzrj.schedule.bean.job.SimpleJobBean;
+import com.fzrj.schedule.bean.jobdetail.http.HttpReqBean;
 
 /**
  * @className:com.fzrj.schedule.bean.mqctrl.AddHttpSimpleBean

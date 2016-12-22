@@ -8,9 +8,10 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fzrj.schedule.bean.http.SimpleHttpReq;
-import com.fzrj.schedule.bean.job.JobBean;
+import com.fzrj.schedule.bean.job.SimpleJobBean;
+import com.fzrj.schedule.bean.jobdetail.http.HttpReqBean;
 import com.fzrj.schedule.service.schedule.ScheduleService;
+import com.fzrj.schedule.service.schedule.TestScheuleService;
 import com.rabbitmq.client.Channel;
 
 /**
@@ -27,30 +28,50 @@ public class ScheduleMsgReceiver implements ChannelAwareMessageListener
 	@Autowired
 	private ScheduleService scheduleService;
 
+	@Autowired
+	private TestScheuleService testScheuleService;
+
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception
 	{
-		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		String msg = new String(message.getBody(), "UTF-8");
 		logger.info("收到消息:" + msg);
-		if ("exception test1".equals(msg))
+
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+		if ("exception test3".equals(msg))
 		{
 			throw new Exception("exception test");
+		}
+
+		if ("schedule简单任务测试1".equals(msg))
+		{
+			Date startTime = new Date();
+			System.out.println("开始" + startTime);
+			// 30 s 后执行
+			startTime.setTime(startTime.getTime() + 30 * 1000);
+			long starTime = System.currentTimeMillis();
+			for (int i = 0; i < 1000; i++)
+			{
+				SimpleJobBean simpleJobBean = new SimpleJobBean(Integer.toString(i), "platName", startTime);
+				testScheuleService.addtestJob(simpleJobBean);
+			}
+			long endTime = System.currentTimeMillis();
+			System.out.println("shcedule高并发测试,运行时间:" + (endTime - starTime));
 		}
 
 		if ("shcedule高并发测试".equals(msg))
 		{
 			Date startTime = new Date();
 			System.out.println("开始" + startTime);
+			// 30 s 后执行
 			startTime.setTime(startTime.getTime() + 30 * 1000);
 			long starTime = System.currentTimeMillis();
 			for (int i = 0; i < 1000; i++)
 			{
-				JobBean jobBean = new JobBean(Integer.toString(i), "platName");
-				SimpleHttpReq simpleHttpReq = new SimpleHttpReq("http://localhost:8080/aquatic_order_service/index.jsp",
-						"", startTime);
-				simpleHttpReq.setReqMethod("GET");
-				scheduleService.addHttpSimpleJob(simpleHttpReq, jobBean, false);
+				SimpleJobBean simpleJobBean = new SimpleJobBean(Integer.toString(i), "platName", startTime);
+				HttpReqBean httpReqBean = new HttpReqBean("http://localhost:8080/aquatic_order_service/index.jsp", "");
+				httpReqBean.setReqMethod("GET");
+				scheduleService.addHttpSimpleJob(httpReqBean, simpleJobBean, false);
 			}
 			long endTime = System.currentTimeMillis();
 			System.out.println("shcedule高并发测试,运行时间:" + (endTime - starTime));

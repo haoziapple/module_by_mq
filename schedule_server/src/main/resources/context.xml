@@ -129,6 +129,12 @@
 	<rabbit:queue id="addHttpSimpleJobQueue"
 		name="addHttpSimpleJob_queue_${rabbitmq.env}_${rabbitmq.server.key}"
 		durable="true" auto-delete="false" exclusive="false" />
+	<rabbit:queue id="addMqCronJobQueue"
+		name="addMqCronJob_queue_${rabbitmq.env}_${rabbitmq.server.key}"
+		durable="true" auto-delete="false" exclusive="false" />
+	<rabbit:queue id="addMqSimpleJobQueue"
+		name="addMqSimpleJob_queue_${rabbitmq.env}_${rabbitmq.server.key}"
+		durable="true" auto-delete="false" exclusive="false" />
 	<rabbit:queue id="deleteJobQueue"
 		name="deleteJob_queue_${rabbitmq.env}_${rabbitmq.server.key}" durable="true"
 		auto-delete="false" exclusive="false" />
@@ -143,6 +149,10 @@
 				key="addHttpCronJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
 			<rabbit:binding queue="addHttpSimpleJobQueue"
 				key="addHttpSimpleJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
+			<rabbit:binding queue="addMqCronJobQueue"
+				key="addMqCronJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
+			<rabbit:binding queue="addMqSimpleJobQueue"
+				key="addMqSimpleJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
 			<rabbit:binding queue="deleteJobQueue"
 				key="deleteJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
 			<rabbit:binding queue="haoziDemoQueue" key="haozi_demo"></rabbit:binding>
@@ -159,6 +169,8 @@
 		prefetch="1">
 		<rabbit:listener queues="addHttpCronJobQueue" ref="addHttpCronJobReceiver" />
 		<rabbit:listener queues="addHttpSimpleJobQueue" ref="addHttpSimpleJobReceiver" />
+		<rabbit:listener queues="addMqCronJobQueue" ref="addMqCronJobReceiver" />
+		<rabbit:listener queues="addMqSimpleJobQueue" ref="addMqSimpleJobReceiver" />
 		<rabbit:listener queues="deleteJobQueue" ref="deleteJobReceiver" />
 		<rabbit:listener queues="haoziDemoQueue" ref="msgReceiver" />
 	</rabbit:listener-container>
@@ -166,6 +178,8 @@
 	<!-- 消息接收者 -->
 	<bean id="addHttpCronJobReceiver" class="com.fzrj.schedule.server.AddHttpCronJobReceiver"></bean>
 	<bean id="addHttpSimpleJobReceiver" class="com.fzrj.schedule.server.AddHttpSimpleJobReceiver"></bean>
+	<bean id="addMqCronJobReceiver" class="com.fzrj.schedule.server.AddMqCronJobReceiver"></bean>
+	<bean id="addMqSimpleJobReceiver" class="com.fzrj.schedule.server.AddMqSimpleJobReceiver"></bean>
 	<bean id="deleteJobReceiver" class="com.fzrj.schedule.server.DeleteJobReceiver"></bean>
 	<bean id="msgReceiver" class="com.fzrj.schedule.server.ScheduleMsgReceiver"></bean>
 
@@ -174,15 +188,17 @@
 		class="org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptorFactoryBean">
 		<!-- 重试失败后消息恢复类 -->
 		<property name="messageRecoverer">
-			<bean class="com.fzrj.schedule.server.MsgRecoverer" />
+			<bean class="com.fzrj.schedule.server.MsgRecoverer">
+				<property name="maxRecTimes" value="5" /><!-- 最大重新入队次数 -->
+			</bean>
 		</property>
 		<!-- 出现异常时的操作策略策略 -->
 		<property name="retryOperations">
 			<bean class="org.springframework.retry.support.RetryTemplate">
 				<property name="backOffPolicy"><!-- 补偿策略 -->
 					<bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
-						<property name="initialInterval" value="10000" /><!-- 失败后首次重试间隔 -->
-						<property name="multiplier" value="1.01" /><!-- 重试间隔的增长系数 -->
+						<property name="initialInterval" value="1000" /><!-- 失败后首次重试间隔 -->
+						<property name="multiplier" value="2.00" /><!-- 重试间隔的增长系数 -->
 						<property name="maxInterval" value="30000" /><!-- 最大重试间隔 -->
 					</bean>
 				</property>

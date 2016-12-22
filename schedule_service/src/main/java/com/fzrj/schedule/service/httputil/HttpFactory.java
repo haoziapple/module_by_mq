@@ -13,7 +13,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.fzrj.schedule.bean.http.HttpReqBean;
+import com.fzrj.schedule.bean.jobdetail.http.HttpReqBean;
 import com.fzrj.schedule.constant.HttpConstant;
 
 /**

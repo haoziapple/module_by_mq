@@ -28,6 +28,7 @@ public class DeleteJobReceiver implements ChannelAwareMessageListener
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception
 	{
+
 		JobBean jobBean = null;
 		try
 		{
@@ -38,15 +39,16 @@ public class DeleteJobReceiver implements ChannelAwareMessageListener
 		}
 		catch (Exception e)
 		{
-			logger.error("删除定时任务,请求非法", e);
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+			logger.error("添加一般类型Http定时任务,请求非法", e);
 			return;
 		}
-		finally
-		{
-			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-		}
+
+		// 确认接收消息
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
 		scheduleService.deleteJob(jobBean);
+
 	}
 
 }

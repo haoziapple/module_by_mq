@@ -32,7 +32,7 @@ public class MqConnectionFactory
 
 	public static String ENV;
 
-	public static String KEY;
+	public static String SCHEDULE_SERVER;
 
 	static
 	{
@@ -46,7 +46,7 @@ public class MqConnectionFactory
 			USERNAME = properties.getProperty("rabbitmq.username");
 			PASSWORD = properties.getProperty("rabbitmq.password");
 			ENV = properties.getProperty("rabbitmq.env");
-			KEY = properties.getProperty("rabbitmq.server.key");
+			SCHEDULE_SERVER = properties.getProperty("rabbitmq.schedule.server");
 
 		}
 		catch (Exception e)

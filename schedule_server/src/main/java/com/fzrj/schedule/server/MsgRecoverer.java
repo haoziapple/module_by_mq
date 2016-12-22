@@ -21,25 +21,43 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MsgRecoverer implements MessageRecoverer
 {
 	private static Logger logger = LogManager.getLogger(MsgRecoverer.class);
+
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+
+	private int maxRecTimes;
 
 	@Override
 	public void recover(Message message, Throwable cause)
 	{
-		Map<String, Object> headers = message.getMessageProperties().getHeaders();
-		headers.put("x-exception-stacktrace", getErrStackTrace(cause));
-		headers.put("x-exception-message",
-				cause.getCause() != null ? cause.getCause().getMessage() : cause.getMessage());
-		headers.put("x-original-exchange", message.getMessageProperties().getReceivedExchange());
-		headers.put("x-original-routingKey", message.getMessageProperties().getReceivedRoutingKey());
-		// 将异常消息重新发送
-		this.rabbitTemplate.send(message.getMessageProperties().getReceivedExchange(),
-				message.getMessageProperties().getReceivedRoutingKey(), message);
+		if (!this.reachMaxRecTimes(message, cause))
+		{
+			// 将异常消息重新发送
+			this.rabbitTemplate.send(message.getMessageProperties().getReceivedExchange(),
+					message.getMessageProperties().getReceivedRoutingKey(), message);
+		}
 
-		logger.error("处理消息异常,重新发送,msg:" + new String(message.getBody()), cause);
-		
-		// TODO 重新入队一定次数后，说明此服务不可用，将发送告警并拒绝所有消息
+		logger.error("处理消息异常,msg:" + new String(message.getBody()), cause);
+	}
+
+	/**
+	 * 处理异常消息头，并返回判断是否回队操作
+	 */
+	private boolean reachMaxRecTimes(Message message, Throwable cause)
+	{
+		Map<String, Object> headers = message.getMessageProperties().getHeaders();
+		System.out.println(headers);
+		int recTimes = headers.get("recTimes") == null ? 0 : (int) headers.get("recTimes");
+		if (recTimes >= maxRecTimes)
+		{
+			return true;
+		}
+		headers.put("exception-stacktrace", getErrStackTrace(cause));
+		headers.put("exception-message", cause.getCause() != null ? cause.getCause().getMessage() : cause.getMessage());
+		headers.put("original-exchange", message.getMessageProperties().getReceivedExchange());
+		headers.put("original-routingKey", message.getMessageProperties().getReceivedRoutingKey());
+		headers.put("recTimes", recTimes + 1);
+		return false;
 	}
 
 	/**
@@ -53,4 +71,13 @@ public class MsgRecoverer implements MessageRecoverer
 		return stringWriter.getBuffer().toString();
 	}
 
+	public int getMaxRecTimes()
+	{
+		return maxRecTimes;
+	}
+
+	public void setMaxRecTimes(int maxRecTimes)
+	{
+		this.maxRecTimes = maxRecTimes;
+	}
 }

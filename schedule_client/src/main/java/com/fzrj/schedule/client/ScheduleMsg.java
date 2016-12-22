@@ -23,12 +23,18 @@ public class ScheduleMsg
 	private static final String EXCHANGE_NAME = "schedule_exchange" + "_" + MqConnectionFactory.ENV;
 
 	private static final String ADD_HTTP_CRON_JOB_KEY = "addHttpCronJob" + "_" + MqConnectionFactory.ENV + "_"
-			+ MqConnectionFactory.KEY;
+			+ MqConnectionFactory.SCHEDULE_SERVER;
 
-	private static String ADD_HTTP_SIMPLE_JOB_KEY = "addHttpSimpleJob" + "_" + MqConnectionFactory.ENV + "_"
-			+ MqConnectionFactory.KEY;
+	private static final String ADD_HTTP_SIMPLE_JOB_KEY = "addHttpSimpleJob" + "_" + MqConnectionFactory.ENV + "_"
+			+ MqConnectionFactory.SCHEDULE_SERVER;
+	
+	private static final String ADD_MQ_CRON_JOB_KEY = "addMqCronJob" + "_" + MqConnectionFactory.ENV + "_"
+			+ MqConnectionFactory.SCHEDULE_SERVER;
 
-	private static String DELETE_JOB_KEY = "deleteJob" + "_" + MqConnectionFactory.ENV + "_" + MqConnectionFactory.KEY;
+	private static final String ADD_MQ_SIMPLE_JOB_KEY = "addMqSimpleJob" + "_" + MqConnectionFactory.ENV + "_"
+			+ MqConnectionFactory.SCHEDULE_SERVER;
+
+	private static final String DELETE_JOB_KEY = "deleteJob" + "_" + MqConnectionFactory.ENV + "_" + MqConnectionFactory.SCHEDULE_SERVER;
 
 	/**
 	 * 添加Cron类型的Http定时任务

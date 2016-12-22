@@ -7,9 +7,9 @@ public class SimpleJobBean extends JobBean
 	/**
 	 * 指定任务开始时间，不重试
 	 */
-	public SimpleJobBean(String reqUrl, String reqBody, Date startTime)
+	public SimpleJobBean(String jobKey, String platName, Date startTime)
 	{
-		super(reqUrl, reqBody);
+		super(jobKey, platName);
 		this.startTime = startTime;
 		Date endDate = new Date();
 		endDate.setTime(startTime.getTime() + 10000L);
@@ -19,9 +19,9 @@ public class SimpleJobBean extends JobBean
 	/**
 	 * 指定任务开始时间与重试机制
 	 */
-	public SimpleJobBean(String reqUrl, String reqBody, Date startTime, int repeatCount, long repeatInterval)
+	public SimpleJobBean(String jobKey, String platName, Date startTime, int repeatCount, long repeatInterval)
 	{
-		super(reqUrl, reqBody);
+		super(jobKey, platName);
 		this.startTime = startTime;
 		this.repeatCount = repeatCount;
 		this.repeatInterval = repeatInterval;
@@ -32,18 +32,18 @@ public class SimpleJobBean extends JobBean
 	/**
 	 * 指定任务延迟时间，不重试
 	 */
-	public SimpleJobBean(String reqUrl, String reqBody, long pendTime)
+	public SimpleJobBean(String jobKey, String platName, long pendTime)
 	{
-		super(reqUrl, reqBody);
+		super(jobKey, platName);
 		this.pendTime = pendTime;
 	}
 	
 	/**
 	 * 指定任务延迟时间与重试机制
 	 */
-	public SimpleJobBean(String reqUrl, String reqBody, long pendTime, int repeatCount, long repeatInterval)
+	public SimpleJobBean(String jobKey, String platName, long pendTime, int repeatCount, long repeatInterval)
 	{
-		super(reqUrl, reqBody);
+		super(jobKey, platName);
 		this.pendTime = pendTime;
 		this.repeatCount = repeatCount;
 		this.repeatInterval = repeatInterval;

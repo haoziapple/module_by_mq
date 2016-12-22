@@ -39,12 +39,11 @@ public class AddHttpSimpleJobReceiver implements ChannelAwareMessageListener
 		catch (Exception e)
 		{
 			logger.error("添加一般类型Http定时任务,请求非法", e);
+			// 确认消息并返回，不处理非法消息
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 			return;
 		}
-		finally
-		{
-			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-		}
+		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
 		scheduleService.addHttpSimpleJob(addhttpSimpleBean.getHttpReqBean(), addhttpSimpleBean.getSimpleJobBean(),
 				addhttpSimpleBean.isOverWrite());

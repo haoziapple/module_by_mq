@@ -1,7 +1,7 @@
 package com.fzrj.schedule.bean.mqctrl;
 
-import com.fzrj.schedule.bean.http.HttpReqBean;
 import com.fzrj.schedule.bean.job.CronJobBean;
+import com.fzrj.schedule.bean.jobdetail.http.HttpReqBean;
 
 /**
  * @className:com.fzrj.schedule.bean.mqctrl.AddHttpCronBean

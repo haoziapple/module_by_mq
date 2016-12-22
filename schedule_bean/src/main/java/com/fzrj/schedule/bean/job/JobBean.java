@@ -1,5 +1,6 @@
 package com.fzrj.schedule.bean.job;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public class JobBean
 	/**
 	 * 任务携带参数map
 	 */
-	private Map<String, String> map;
+	private Map<String, String> map=new HashMap<String, String>();
 
 	/**
 	 * 通过平台名platName与jobKey确定一个定时任务，同一平台里jobKey唯一
