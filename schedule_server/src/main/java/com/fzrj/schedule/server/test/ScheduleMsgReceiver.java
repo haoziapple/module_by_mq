@@ -1,4 +1,4 @@
-package com.fzrj.schedule.server;
+package com.fzrj.schedule.server.test;
 
 import java.util.Date;
 
@@ -15,7 +15,7 @@ import com.fzrj.schedule.service.schedule.TestScheuleService;
 import com.rabbitmq.client.Channel;
 
 /**
- * @className:com.fzrj.schedule.server.ScheduleMsgReceiver
+ * @className:com.fzrj.schedule.server.test.ScheduleMsgReceiver
  * @description:定时器消息接收器(测试用)
  * @version:v1.0.0
  * @date:2016年12月16日 下午5:02:59

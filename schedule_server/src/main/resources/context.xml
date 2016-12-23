@@ -181,7 +181,7 @@
 	<bean id="addMqCronJobReceiver" class="com.fzrj.schedule.server.AddMqCronJobReceiver"></bean>
 	<bean id="addMqSimpleJobReceiver" class="com.fzrj.schedule.server.AddMqSimpleJobReceiver"></bean>
 	<bean id="deleteJobReceiver" class="com.fzrj.schedule.server.DeleteJobReceiver"></bean>
-	<bean id="msgReceiver" class="com.fzrj.schedule.server.ScheduleMsgReceiver"></bean>
+	<bean id="msgReceiver" class="com.fzrj.schedule.server.test.ScheduleMsgReceiver"></bean>
 
 	<!-- 实现异常事件处理逻辑 -->
 	<bean id="retryOperationsInterceptorFactoryBean"
