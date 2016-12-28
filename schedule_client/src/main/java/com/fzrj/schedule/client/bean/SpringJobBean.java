@@ -13,9 +13,14 @@ public class SpringJobBean
 
 	private String methodName;
 
-	private Object paramBean;
+	private String paramBean;
 
-	public SpringJobBean(String beanName, String methodName, Object paramBean)
+	public SpringJobBean()
+	{
+		super();
+	}
+
+	public SpringJobBean(String beanName, String methodName, String paramBean)
 	{
 		this.beanName = beanName;
 		this.methodName = methodName;
@@ -27,7 +32,7 @@ public class SpringJobBean
 		return beanName;
 	}
 
-	public Object getParamBean()
+	public String getParamBean()
 	{
 		return paramBean;
 	}

@@ -4,6 +4,11 @@ import java.util.Date;
 
 public class SimpleJobBean extends JobBean
 {
+	public SimpleJobBean()
+	{
+		super();
+	}
+
 	/**
 	 * 指定任务开始时间，不重试
 	 */

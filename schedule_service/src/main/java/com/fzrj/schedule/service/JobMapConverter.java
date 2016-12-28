@@ -92,7 +92,7 @@ public class JobMapConverter
 	public static MqMsgBean getMqJob(JobDataMap data)
 	{
 		MqMsgBean mqMsgBean = new MqMsgBean(data.getString(MqMsgBean.EXCHANGE_NAME_KEY),
-				data.getString(MqMsgBean.ROUTING_KEY), data.getString(MqMsgBean.ROUTING_KEY));
+				data.getString(MqMsgBean.ROUTING_KEY), data.getString(MqMsgBean.MSG_BODY_KEY));
 		return mqMsgBean;
 	}
 }

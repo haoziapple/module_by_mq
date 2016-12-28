@@ -32,14 +32,14 @@ public class AddMqCronJobReceiver implements ChannelAwareMessageListener
 		try
 		{
 			String msg = new String(message.getBody(), "UTF-8");
-			logger.debug("添加Cron类型Http定时任务消息接收msg:" + msg);
+			logger.debug("添加Cron类型MQ定时任务消息接收msg:" + msg);
 			ObjectMapper mapper = new ObjectMapper(); // 转换器
 			addMqCronBean = mapper.readValue(msg, AddMqCronBean.class);
 		}
 		catch (Exception e)
 		{
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-			logger.error("添加Cron类型Mq定时任务,请求非法", e);
+			logger.error("添加Cron类型MQ定时任务,请求非法", e);
 			return;
 		}
 

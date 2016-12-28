@@ -31,6 +31,11 @@ public class JobBean
 	 * 任务携带参数map
 	 */
 	private Map<String, String> map=new HashMap<String, String>();
+	
+	public JobBean()
+	{
+		super();
+	}
 
 	/**
 	 * 通过平台名platName与jobKey确定一个定时任务，同一平台里jobKey唯一

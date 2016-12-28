@@ -33,6 +33,11 @@ public class HttpReqBean
 	 * 请求头
 	 */
 	private Map<String, String> headMap = new HashMap<String, String>();
+	
+	public HttpReqBean()
+	{
+		super();
+	}
 
 	public HttpReqBean(String reqUrl, String reqBody)
 	{

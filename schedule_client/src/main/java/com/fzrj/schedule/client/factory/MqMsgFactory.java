@@ -14,9 +14,22 @@ import com.fzrj.schedule.client.util.JsonUtil;
  */
 public class MqMsgFactory
 {
+	/**
+	 * 创建定时任务消息
+	 */
 	public static MqMsgBean buildMqMsg(String beanName, String methodName, Object paramBean)
 	{
-		SpringJobBean springJobBean = new SpringJobBean(beanName, methodName, paramBean);
+		SpringJobBean springJobBean = new SpringJobBean(beanName, methodName, JsonUtil.convertObjToString(paramBean));
+		return new MqMsgBean(ConfigUtil.getPlatExchange(), ConfigUtil.getPlatQueue(),
+				JsonUtil.convertObjToString(springJobBean));
+	}
+
+	/**
+	 * 创建定时任务消息(参数bean使用json字串)
+	 */
+	public static MqMsgBean buildMqMsg(String beanName, String methodName, String paramBeanJson)
+	{
+		SpringJobBean springJobBean = new SpringJobBean(beanName, methodName, paramBeanJson);
 		return new MqMsgBean(ConfigUtil.getPlatExchange(), ConfigUtil.getPlatQueue(),
 				JsonUtil.convertObjToString(springJobBean));
 	}

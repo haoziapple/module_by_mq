@@ -29,7 +29,7 @@ import com.rabbitmq.client.Envelope;
 public class MqReceiver implements Runnable
 {
 	private static Logger logger = LogManager.getLogger(MqReceiver.class);
-	
+
 	@Override
 	public void run()
 	{
@@ -55,15 +55,22 @@ public class MqReceiver implements Runnable
 						byte[] body) throws IOException
 				{
 					String message = new String(body, "UTF-8");
+					logger.debug("mq定时任务接收消息" + message);
 
 					try
 					{
 						// 根据消息调用相应的Spring中bean的方法
 						SpringJobBean springJobBean = JsonUtil.convertStringToObj(message, SpringJobBean.class);
 						Object springBean = SpringContextUtil.getBean(springJobBean.getBeanName());
-						Method m = springBean.getClass().getDeclaredMethod(springJobBean.getMethodName(),
-								springJobBean.getParamBean().getClass());
-						m.invoke(springBean, springJobBean.getParamBean());
+						Method[] mArray = springBean.getClass().getDeclaredMethods();
+						for (Method m : mArray)
+						{
+							if (m.getName().equals(springJobBean.getMethodName()))
+							{
+								Class clzz  = m.getParameterTypes()[0];
+								m.invoke(springBean, JsonUtil.convertStringToObj(springJobBean.getParamBean(), clzz));
+							}
+						}
 					}
 					catch (Exception e)
 					{

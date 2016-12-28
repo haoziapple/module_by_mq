@@ -40,7 +40,7 @@ public class DeleteJobReceiver implements ChannelAwareMessageListener
 		catch (Exception e)
 		{
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-			logger.error("添加一般类型Http定时任务,请求非法", e);
+			logger.error("删除定时任务消息,请求非法", e);
 			return;
 		}
 

@@ -28,7 +28,7 @@
 	<Loggers>
 		<!-- 记录器输出文件为debug级别 -->
 		<!-- 根 控制台输出级别 -->
-		<Root level="info">
+		<Root level="debug">
 			<AppenderRef ref="rollingfile" />
 			<AppenderRef ref="STDOUT" />
 		</Root>

@@ -29,6 +29,11 @@ public class MqMsgBean
 	 * 消息体
 	 */
 	private String msgBody = "";
+	
+	public MqMsgBean()
+	{
+		super();
+	}
 
 	public MqMsgBean(String exchangeName, String routingKey, String msgBody)
 	{

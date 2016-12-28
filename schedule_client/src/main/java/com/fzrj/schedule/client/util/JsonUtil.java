@@ -46,4 +46,9 @@ public class JsonUtil
 			return null;
 		}
 	}
+	
+	public static void main(String[] args)
+	{
+		System.out.println(convertStringToObj(convertObjToString(new Integer(1)), Integer.class));
+	}
 }

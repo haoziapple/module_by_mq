@@ -165,7 +165,7 @@
 	<!-- 监听多队列用逗号分隔？ -->
 	<rabbit:listener-container
 		connection-factory="connectionFactory" acknowledge="manual"
-		advice-chain="retryOperationsInterceptorFactoryBean" concurrency="10"
+		advice-chain="retryOperationsInterceptorFactoryBean" concurrency="5"
 		prefetch="1">
 		<rabbit:listener queues="addHttpCronJobQueue" ref="addHttpCronJobReceiver" />
 		<rabbit:listener queues="addHttpSimpleJobQueue" ref="addHttpSimpleJobReceiver" />

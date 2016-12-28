@@ -17,6 +17,11 @@ public class AddHttpSimpleBean
 	private SimpleJobBean simpleJobBean;
 
 	private boolean overWrite;
+	
+	public AddHttpSimpleBean()
+	{
+		super();
+	}
 
 	public AddHttpSimpleBean(HttpReqBean httpReqBean, SimpleJobBean simpleJobBean, boolean overWrite)
 	{

@@ -20,6 +20,11 @@ public class AddHttpCronBean
 	 * 是否覆盖，true将先尝试删除原有定时任务
 	 */
 	private boolean overWrite;
+	
+	public AddHttpCronBean()
+	{
+		super();
+	}
 
 	public AddHttpCronBean(HttpReqBean httpReqBean, CronJobBean cronJobBean, boolean overWrite)
 	{

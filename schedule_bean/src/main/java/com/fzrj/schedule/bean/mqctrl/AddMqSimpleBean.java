@@ -17,6 +17,11 @@ public class AddMqSimpleBean
 	private SimpleJobBean simpleJobBean;
 
 	private boolean overWrite;
+	
+	public AddMqSimpleBean()
+	{
+		super();
+	}
 
 	public AddMqSimpleBean(MqMsgBean mqMsgBean, SimpleJobBean simpleJobBean, boolean overWrite)
 	{

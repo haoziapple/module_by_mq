@@ -25,13 +25,14 @@ import com.fzrj.schedule.service.SpringContextUtil;
  */
 public class MqMsgJob implements Job
 {
-	private static Logger logger = LogManager.getLogger(HttpJob.class);
+	private static Logger logger = LogManager.getLogger(MqMsgJob.class);
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException
 	{
-		logger.info("开始执行MQ定时任务");
+
 		JobDataMap data = context.getMergedJobDataMap();
+		logger.debug("开始执行MQ定时任务 JobDataMap data:" + data);
 		MqMsgBean mqMsgBean = JobMapConverter.getMqJob(data);
 
 		RabbitTemplate rabbitTemplate = (RabbitTemplate) SpringContextUtil.getBean("rabbitTemplate");
@@ -46,7 +47,8 @@ public class MqMsgJob implements Job
 			logger.error("获取定时消息异常", e);
 		}
 
+		logger.debug("发送MQ定时信息msg:" + message);
 		rabbitTemplate.send(mqMsgBean.getExchangeName(), mqMsgBean.getRoutingKey(), message);
-		logger.info("执行Http定时任务结束");
+
 	}
 }

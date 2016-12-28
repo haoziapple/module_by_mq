@@ -9,6 +9,10 @@ package com.fzrj.schedule.bean.job;
  */
 public class CronJobBean extends JobBean
 {
+	public CronJobBean()
+	{
+		super();
+	}
 
 	public CronJobBean(String jobKey, String platName, String cronExpression)
 	{

@@ -20,6 +20,11 @@ public class AddMqCronBean
 	 * 是否覆盖，true将先尝试删除原有定时任务
 	 */
 	private boolean overWrite;
+	
+	public AddMqCronBean()
+	{
+		super();
+	}
 
 	public AddMqCronBean(MqMsgBean mqMsgBean, CronJobBean cronJobBean, boolean overWrite)
 	{
