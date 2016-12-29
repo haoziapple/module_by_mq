@@ -1,6 +1,7 @@
 package com.fzrj.schedule.client.util;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -13,7 +14,7 @@ import com.fzrj.schedule.client.MqReceiver;
  * @date:2016年12月23日 下午9:00:36
  * @author:WangHao
  */
-public class SpringContextUtil implements ApplicationContextAware
+public class SpringContextUtil implements ApplicationContextAware, InitializingBean
 {
 	private static ApplicationContext applicationContext; // Spring应用上下文环境
 
@@ -25,10 +26,7 @@ public class SpringContextUtil implements ApplicationContextAware
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
 	{
 		SpringContextUtil.applicationContext = applicationContext;
-		// 初始化上下文后，启动一个队列消息接收线程
-		MqReceiver mqReceiver = new MqReceiver();
-		Thread t = new Thread(mqReceiver);
-		t.start();
+
 	}
 
 	public static ApplicationContext getApplicationContext()
@@ -40,6 +38,15 @@ public class SpringContextUtil implements ApplicationContextAware
 	public static <T> T getBean(String name) throws BeansException
 	{
 		return (T) applicationContext.getBean(name);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception
+	{
+		// 初始化完成后，启动一个队列消息接收线程
+		MqReceiver mqReceiver = new MqReceiver();
+		Thread t = new Thread(mqReceiver);
+		t.start();
 	}
 
 }

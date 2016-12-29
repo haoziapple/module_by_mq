@@ -63,13 +63,20 @@ public class MqReceiver implements Runnable
 						SpringJobBean springJobBean = JsonUtil.convertStringToObj(message, SpringJobBean.class);
 						Object springBean = SpringContextUtil.getBean(springJobBean.getBeanName());
 						Method[] mArray = springBean.getClass().getDeclaredMethods();
+						boolean methodFound = false;
 						for (Method m : mArray)
 						{
 							if (m.getName().equals(springJobBean.getMethodName()))
 							{
-								Class clzz  = m.getParameterTypes()[0];
+								methodFound = true;
+								Class clzz = m.getParameterTypes()[0];
 								m.invoke(springBean, JsonUtil.convertStringToObj(springJobBean.getParamBean(), clzz));
+								break;
 							}
+						}
+						if (!methodFound)
+						{
+							throw new Exception("任务方法名错误" + springJobBean);
 						}
 					}
 					catch (Exception e)
@@ -84,6 +91,7 @@ public class MqReceiver implements Runnable
 				}
 			};
 			channel.basicConsume(ConfigUtil.getPlatQueue(), false, consumer);
+			logger.debug("消息监听器初始化完成-exchange:" + ConfigUtil.getPlatExchange() + " queue:" + ConfigUtil.getPlatQueue());
 		}
 		catch (Exception e)
 		{
