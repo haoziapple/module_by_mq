@@ -2,6 +2,9 @@ package com.fzrj.schedule.client.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -52,6 +55,8 @@ public class ConfigUtil
 	private static String platName;
 	// 客户端服务名
 	private static String platServer;
+	// 服务名列表
+	private static List<String> serverList = new ArrayList<String>();
 
 	static
 	{
@@ -68,6 +73,7 @@ public class ConfigUtil
 			scheduleServer = properties.getProperty("rabbitmq.schedule.server");
 			platName = properties.getProperty("rabbitmq.client.platname");
 			platServer = properties.getProperty("rabbitmq.client.platserver");
+			serverList = Arrays.asList(properties.getProperty("rabbitmq.client.serverlist").split("\\|"));
 		}
 		catch (Exception e)
 		{
@@ -84,6 +90,11 @@ public class ConfigUtil
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static List<String> getServerList()
+	{
+		return serverList;
 	}
 
 	public static String getHost()

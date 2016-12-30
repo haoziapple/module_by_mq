@@ -18,9 +18,9 @@
 		</Console>
 
 		<!-- 输出到分割文件并压缩 -->
-		<RollingFile name="rollingfile" fileName="E:/home/logs/schedule_service.log"
+		<RollingFile name="rollingfile" fileName="/home/logs/schedule_service.log"
 			append="true"
-			filePattern="E:/home/schedulelogs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+			filePattern="/home/schedulelogs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
 			<PatternLayout pattern="%d %-5p [%t] %c{36} (%F:%L) ----- %m%n%ex" />
 			<SizeBasedTriggeringPolicy size="50MB" />
 		</RollingFile>
