@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonUtil
 {
+	
+	private static Logger logger = LogManager.getLogger(JsonUtil.class);
 	/**
 	 * javabean转json
 	 */
