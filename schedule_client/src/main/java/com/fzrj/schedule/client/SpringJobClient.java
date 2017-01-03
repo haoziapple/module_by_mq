@@ -35,6 +35,17 @@ public class SpringJobClient
 		ScheduleClient.deleteJob(jobBean);
 	}
 
+	/**
+	 * @Description:添加Spring定时任务，指定触发时间,不重试
+	 * @param beanName
+	 * @param methodName
+	 * @param paramBean
+	 * @param key
+	 * @param startTime
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2016年12月30日 上午11:23:29
+	 */
 	public static void addSpringJob(String beanName, String methodName, Object paramBean, String key, Date startTime)
 	{
 		addSpringJob(beanName, methodName, paramBean, key, startTime, 0, 0);
@@ -45,8 +56,20 @@ public class SpringJobClient
 		addSpringJob(beanName, methodName, paramBean, key, pendTime, 0, 0);
 	}
 
+	public static void addSpringJob(String beanName, String methodName, Object paramBean, String key, Date startTime,
+			String serverName)
+	{
+		addSpringJob(beanName, methodName, paramBean, key, startTime, 0, 0, serverName);
+	}
+
+	public static void addSpringJob(String beanName, String methodName, Object paramBean, String key, Long pendTime,
+			String serverName)
+	{
+		addSpringJob(beanName, methodName, paramBean, key, pendTime, 0, 0, serverName);
+	}
+
 	/**
-	 * @Description:添加Spring定时任务，指定触发时间
+	 * @Description:添加Spring定时任务，指定触发时间与重试机制
 	 * @param beanName(调用的bean名称)
 	 * @param methodName(调用的方法名称)
 	 * @param paramBean(调用的参数bean)
@@ -65,6 +88,17 @@ public class SpringJobClient
 		SimpleJobBean simpleJobBean = JobFactory.buildSimpleJob(getSpringJobName(beanName, methodName, key), startTime,
 				repeatCount, repeatInterval);
 		MqMsgBean mqMsgBean = MqMsgFactory.buildMqMsg(beanName, methodName, paramBean);
+		ScheduleClient.addMqSimpleJob(new AddMqSimpleBean(mqMsgBean, simpleJobBean, true));
+	}
+
+	// 添加Spring定时任务，指定触发时间, 指定服务名
+	public static void addSpringJob(String beanName, String methodName, Object paramBean, String key, Date startTime,
+			int repeatCount, long repeatInterval, String serverName)
+	{
+		// 使用MQ组件的定时任务
+		SimpleJobBean simpleJobBean = JobFactory.buildSimpleJob(getSpringJobName(beanName, methodName, key), startTime,
+				repeatCount, repeatInterval);
+		MqMsgBean mqMsgBean = MqMsgFactory.buildMqMsg(beanName, methodName, paramBean, serverName);
 		ScheduleClient.addMqSimpleJob(new AddMqSimpleBean(mqMsgBean, simpleJobBean, true));
 	}
 
@@ -92,6 +126,30 @@ public class SpringJobClient
 	}
 
 	/**
+	 * @Description:添加Spring定时任务，指定触发延迟,指定服务名
+	 * @param beanName
+	 * @param methodName
+	 * @param paramBean
+	 * @param key
+	 * @param pendTime
+	 * @param repeatCount
+	 * @param repeatInterval
+	 * @param serverName
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2016年12月30日 上午11:24:31
+	 */
+	public static void addSpringJob(String beanName, String methodName, Object paramBean, String key, Long pendTime,
+			int repeatCount, long repeatInterval, String serverName)
+	{
+		// 使用MQ组件的定时任务
+		SimpleJobBean simpleJobBean = JobFactory.buildSimpleJob(getSpringJobName(beanName, methodName, key), pendTime,
+				repeatCount, repeatInterval);
+		MqMsgBean mqMsgBean = MqMsgFactory.buildMqMsg(beanName, methodName, paramBean, serverName);
+		ScheduleClient.addMqSimpleJob(new AddMqSimpleBean(mqMsgBean, simpleJobBean, true));
+	}
+
+	/**
 	 * @Description:添加cron类定时任务
 	 * @param beanName
 	 * @param methodName
@@ -107,6 +165,26 @@ public class SpringJobClient
 	{
 		CronJobBean cronJobBean = JobFactory.buildCronJob(getSpringJobName(beanName, methodName, key), cronExp);
 		MqMsgBean mqMsgBean = MqMsgFactory.buildMqMsg(beanName, methodName, paramBean);
+		ScheduleClient.addMqCronJob(new AddMqCronBean(mqMsgBean, cronJobBean, true));
+	}
+
+	/**
+	 * @Description:添加cron类定时任务, 指定服务名
+	 * @param beanName
+	 * @param methodName
+	 * @param paramBean
+	 * @param key
+	 * @param cronExp
+	 * @param serverName
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2016年12月30日 上午11:24:45
+	 */
+	public static void addSpringCronJob(String beanName, String methodName, Object paramBean, String key,
+			String cronExp, String serverName)
+	{
+		CronJobBean cronJobBean = JobFactory.buildCronJob(getSpringJobName(beanName, methodName, key), cronExp);
+		MqMsgBean mqMsgBean = MqMsgFactory.buildMqMsg(beanName, methodName, paramBean, serverName);
 		ScheduleClient.addMqCronJob(new AddMqCronBean(mqMsgBean, cronJobBean, true));
 	}
 
