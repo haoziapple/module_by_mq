@@ -10,6 +10,7 @@ import com.fzrj.schedule.bean.jobdetail.mq.MqMsgBean;
 import com.fzrj.schedule.bean.mqctrl.AddHttpSimpleBean;
 import com.fzrj.schedule.bean.mqctrl.AddMqSimpleBean;
 import com.fzrj.schedule.client.ScheduleClient;
+import com.fzrj.schedule.client.builder.SpringJobBuilder;
 import com.fzrj.schedule.client.factory.JobFactory;
 import com.fzrj.schedule.client.factory.MqMsgFactory;
 
@@ -31,10 +32,10 @@ public class ClientDemo
 	public static void addMqSimpleJobDemo() throws IOException, TimeoutException
 	{
 		// 20s后发起
-		SimpleJobBean simpleJobBean = JobFactory.buildSimpleJob("testJobKey", 20000L);
+		SpringJobBuilder builder = new SpringJobBuilder().setJobCode("testJobCode")
+				.setSpringJob("methodSpringBean", "testMethod", new JobBean("test", "test")).setPendTime(20000L);
 		// 任务将调用methodSpringBean的testMethod方法，参数为new出来的JobBean
-		MqMsgBean mqMsgBean = MqMsgFactory.buildMqMsg("methodSpringBean", "testMethod", new JobBean("test", "test"));
-		ScheduleClient.addMqSimpleJob(new AddMqSimpleBean(mqMsgBean, simpleJobBean, true));
+		ScheduleClient.addMqSimpleJob(builder.buildMqSimpleJob());
 	}
 
 	// 添加一般类型Http定时任务
