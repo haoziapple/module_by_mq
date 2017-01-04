@@ -13,6 +13,9 @@ public final class ArgChecker
 	{
 	}
 
+	/**
+	 *校验参数，表达式为非时抛出非法参数异常
+	 */
 	public static void checkArgument(boolean expression)
 	{
 		if (!expression)

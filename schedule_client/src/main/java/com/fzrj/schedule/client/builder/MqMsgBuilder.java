@@ -51,7 +51,7 @@ public class MqMsgBuilder
 	public MqMsgBean buildMqMsg()
 	{
 		// 任务属性不可为空
-		ArgChecker.checkArgument(null == _serverName || null == _beanName || null == _methodName || null == _paramBean,
+		ArgChecker.checkArgument(null != _serverName && null != _beanName && null != _methodName && null != _paramBean,
 				"任务属性不可为空");
 		SpringJobBean springJobBean = new SpringJobBean(_beanName, _methodName,
 				JsonUtil.convertObjToString(_paramBean));

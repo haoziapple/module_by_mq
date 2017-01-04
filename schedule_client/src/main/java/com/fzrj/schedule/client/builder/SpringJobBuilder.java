@@ -97,7 +97,7 @@ public class SpringJobBuilder
 	 */
 	public SpringJobBuilder setRepeatPolicy(int repeatCount, int repeatInterval)
 	{
-		ArgChecker.checkArgument(repeatCount < 0 || repeatInterval < 0, "重试次数和重试间隔不可小于0");
+		ArgChecker.checkArgument(repeatCount >= 0 && repeatInterval >= 0, "重试次数和重试间隔不可小于0");
 		_repeatCount = repeatCount;
 		_repeatInterval = repeatInterval;
 		return this;
@@ -146,7 +146,7 @@ public class SpringJobBuilder
 	private String getSpringJobName()
 	{
 		// 任务属性不可为空
-		ArgChecker.checkArgument(null == _serverName || null == _beanName || null == _methodName, "任务属性不可为空");
+		ArgChecker.checkArgument(null != _serverName && null != _beanName && null != _methodName, "任务属性不可为空");
 		return _serverName + "_" + _beanName + "_" + _methodName + ":" + _jobCode;
 	}
 }

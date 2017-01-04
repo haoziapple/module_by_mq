@@ -67,7 +67,7 @@ public class JobBuilder
 	 */
 	public JobBuilder setRepeatPolicy(int repeatCount, int repeatInterval)
 	{
-		ArgChecker.checkArgument(repeatCount < 0 || repeatInterval < 0, "重试次数和重试间隔不可小于0");
+		ArgChecker.checkArgument(repeatCount >= 0 && repeatInterval >= 0, "重试次数和重试间隔不可小于0");
 		_repeatCount = repeatCount;
 		_repeatInterval = repeatInterval;
 		return this;
@@ -85,9 +85,9 @@ public class JobBuilder
 	public CronJobBean buildCronJob()
 	{
 		// 任务key不可为空
-		ArgChecker.checkArgument(null == _jobKey, "任务key不可为空");
+		ArgChecker.checkArgument(null != _jobKey, "任务key不可为空");
 		// cron表达式不可为空
-		ArgChecker.checkArgument(null == _cronExp, " cron表达式不可为空");
+		ArgChecker.checkArgument(null != _cronExp, " cron表达式不可为空");
 		return new CronJobBean(_jobKey, _platName, _cronExp);
 	}
 
@@ -97,9 +97,9 @@ public class JobBuilder
 	public SimpleJobBean buildSimpleJob()
 	{
 		// 任务key不可为空
-		ArgChecker.checkArgument(null == _jobKey, "任务key不可为空");
+		ArgChecker.checkArgument(null != _jobKey, "任务key不可为空");
 		// 指定触发时间与延迟触发时间不可都为空
-		ArgChecker.checkArgument(null == _startTime && null == _pendTime, "指定触发时间与延迟触发时间不可都为空");
+		ArgChecker.checkArgument(null != _startTime || null != _pendTime, "指定触发时间与延迟触发时间不可都为空");
 		SimpleJobBean simpleJobBean;
 		if (null != _startTime)
 		{

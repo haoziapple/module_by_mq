@@ -55,6 +55,6 @@ public class JsonUtil
 
 	public static void main(String[] args)
 	{
-		System.out.println(convertStringToObj(convertObjToString(new Integer(1)), Integer.class));
+		System.out.println(convertObjToString(null));
 	}
 }
