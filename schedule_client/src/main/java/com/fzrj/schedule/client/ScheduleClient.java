@@ -9,7 +9,6 @@ import com.fzrj.schedule.bean.mqctrl.AddMqSimpleBean;
 import com.fzrj.schedule.client.util.ConfigUtil;
 import com.fzrj.schedule.client.util.MqConnectionFactory;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
 
 /**
@@ -31,8 +30,7 @@ public class ScheduleClient
 		{
 			String reqStr = mapper.writeValueAsString(addHttpCronBean);
 			// 发送消息
-			Connection connection = MqConnectionFactory.getInstance().newConnection();
-			Channel channel = connection.createChannel();
+			Channel channel = MqConnectionFactory.getInstance();
 			channel.basicPublish(ConfigUtil.getSchExchange(), ConfigUtil.getHttpCronKey(),
 					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
 		}
@@ -52,8 +50,7 @@ public class ScheduleClient
 		{
 			String reqStr = mapper.writeValueAsString(addhttpSimpleBean);
 			// 发送消息
-			Connection connection = MqConnectionFactory.getInstance().newConnection();
-			Channel channel = connection.createChannel();
+			Channel channel = MqConnectionFactory.getInstance();
 			channel.basicPublish(ConfigUtil.getSchExchange(), ConfigUtil.getHttpSimpleKey(),
 					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
 		}
@@ -73,8 +70,7 @@ public class ScheduleClient
 		{
 			String reqStr = mapper.writeValueAsString(addMqCronBean);
 			// 发送消息
-			Connection connection = MqConnectionFactory.getInstance().newConnection();
-			Channel channel = connection.createChannel();
+			Channel channel = MqConnectionFactory.getInstance();
 			channel.basicPublish(ConfigUtil.getSchExchange(), ConfigUtil.getMqCronKey(),
 					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
 		}
@@ -94,8 +90,7 @@ public class ScheduleClient
 		{
 			String reqStr = mapper.writeValueAsString(addMqSimpleBean);
 			// 发送消息
-			Connection connection = MqConnectionFactory.getInstance().newConnection();
-			Channel channel = connection.createChannel();
+			Channel channel = MqConnectionFactory.getInstance();
 			channel.basicPublish(ConfigUtil.getSchExchange(), ConfigUtil.getMqSimpleKey(),
 					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
 		}
@@ -115,8 +110,7 @@ public class ScheduleClient
 		{
 			String reqStr = mapper.writeValueAsString(jobBean);
 			// 发送消息
-			Connection connection = MqConnectionFactory.getInstance().newConnection();
-			Channel channel = connection.createChannel();
+			Channel channel = MqConnectionFactory.getInstance();
 			channel.basicPublish(ConfigUtil.getSchExchange(), ConfigUtil.getDelJobKey(),
 					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
 		}

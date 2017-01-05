@@ -5,7 +5,7 @@
 
 	<groupId>com.fzrj.module</groupId>
 	<artifactId>module_system</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<name>schedule_system</name>

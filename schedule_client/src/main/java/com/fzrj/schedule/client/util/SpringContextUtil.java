@@ -1,6 +1,9 @@
 package com.fzrj.schedule.client.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -14,8 +17,10 @@ import com.fzrj.schedule.client.MqReceiver;
  * @date:2016年12月23日 下午9:00:36
  * @author:WangHao
  */
-public class SpringContextUtil implements ApplicationContextAware, InitializingBean
+public class SpringContextUtil implements ApplicationContextAware, InitializingBean, DisposableBean
 {
+	private static Logger logger = LogManager.getLogger(SpringContextUtil.class);
+
 	private static ApplicationContext applicationContext; // Spring应用上下文环境
 
 	/*
@@ -43,10 +48,17 @@ public class SpringContextUtil implements ApplicationContextAware, InitializingB
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
+		logger.debug("启动一个队列消息接收线程");
 		// 初始化完成后，启动一个队列消息接收线程
-		MqReceiver mqReceiver = new MqReceiver();
-		Thread t = new Thread(mqReceiver);
-		t.start();
+		MqReceiver.startConsumer();
+	}
+
+	@Override
+	public void destroy() throws Exception
+	{
+		logger.debug("停止队列消息接收线程");
+		// 停止队列消息接收线程
+		MqReceiver.stopConsumer();
 	}
 
 }
