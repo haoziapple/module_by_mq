@@ -56,9 +56,9 @@ public class SpringContextUtil implements ApplicationContextAware, InitializingB
 	@Override
 	public void destroy() throws Exception
 	{
-		logger.debug("停止队列消息接收线程");
+		logger.debug("关闭消息队列通道与连接");
 		// 停止队列消息接收线程
-		MqReceiver.stopConsumer();
+		MqConnectionFactory.closeConnection();
 	}
 
 }

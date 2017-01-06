@@ -25,13 +25,22 @@ public class MqConnectionFactory
 	private static Channel channel = null;
 	private static Object lock = new Object();
 
+	/**
+	 * @Description:
+	 * @return
+	 * @throws IOException
+	 * @throws TimeoutException
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2017年1月6日 上午9:22:14
+	 */
 	public static Channel getInstance() throws IOException, TimeoutException
 	{
-		if (channel == null)
+		if (channel == null || !channel.isOpen())
 		{
 			synchronized (lock)
 			{
-				if (channel == null)
+				if (channel == null || !channel.isOpen())
 				{
 					if (factory == null)
 						factory = new ConnectionFactory();
@@ -45,6 +54,23 @@ public class MqConnectionFactory
 			}
 		}
 		return channel;
+	}
+
+	/**
+	 * @Description:关闭通道和连接
+	 * @throws IOException
+	 * @throws TimeoutException
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2017年1月6日 上午9:21:52
+	 */
+	public static void closeConnection() throws IOException, TimeoutException
+	{
+		if (channel != null)
+		{
+			channel.close();
+			channel.getConnection().close();
+		}
 	}
 
 }

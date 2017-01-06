@@ -81,22 +81,4 @@ public class MqReceiver
 			logger.error("初始化队列消息接收类异常", e);
 		}
 	}
-
-	/**
-	 * 停止消息接收器
-	 */
-	public static void stopConsumer() throws IOException
-	{
-		if (channel != null)
-		{
-			try
-			{
-				channel.close();
-			}
-			catch (Exception e)
-			{
-				logger.error("停止消息接收器异常", e);
-			}
-		}
-	}
 }
