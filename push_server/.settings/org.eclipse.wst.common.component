@@ -4,6 +4,7 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+
         <dependent-module archiveName="push_service-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/push_service/push_service">
             <dependency-type>uses</dependency-type>
         </dependent-module>
@@ -13,6 +14,7 @@
         <dependent-module archiveName="push_bean-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/push_bean/push_bean">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+
         <property name="java-output-path" value="/push_server/target/classes"/>
         <property name="context-root" value="fzrj_push_service"/>
     </wb-module>
