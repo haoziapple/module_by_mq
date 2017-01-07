@@ -15,7 +15,7 @@ import com.fzrj.schedule.client.util.JsonUtil;
 public class MqMsgFactory
 {
 	/**
-	 * 创建定时任务消息
+	 * 创建定时任务消息(发送给本服务)
 	 */
 	public static MqMsgBean buildMqMsg(String beanName, String methodName, Object paramBean)
 	{
@@ -31,6 +31,26 @@ public class MqMsgFactory
 	{
 		SpringJobBean springJobBean = new SpringJobBean(beanName, methodName, paramBeanJson);
 		return new MqMsgBean(ConfigUtil.getPlatExchange(), ConfigUtil.getPlatQueue(),
+				JsonUtil.convertObjToString(springJobBean));
+	}
+
+	/**
+	 * 创建定时任务消息(发送给其他服务)
+	 */
+	public static MqMsgBean buildMqMsg(String beanName, String methodName, Object paramBean, String serverName)
+	{
+		SpringJobBean springJobBean = new SpringJobBean(beanName, methodName, JsonUtil.convertObjToString(paramBean));
+		return new MqMsgBean(ConfigUtil.getPlatExchange(), ConfigUtil.getPlatQueue(serverName),
+				JsonUtil.convertObjToString(springJobBean));
+	}
+
+	/**
+	 * 创建定时任务消息(参数bean使用json字串,发送给其他服务)
+	 */
+	public static MqMsgBean buildMqMsg(String beanName, String methodName, String paramBeanJson, String serverName)
+	{
+		SpringJobBean springJobBean = new SpringJobBean(beanName, methodName, paramBeanJson);
+		return new MqMsgBean(ConfigUtil.getPlatExchange(), ConfigUtil.getPlatQueue(serverName),
 				JsonUtil.convertObjToString(springJobBean));
 	}
 }

@@ -1,20 +1,17 @@
 package com.fzrj.schedule.client;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.fzrj.schedule.client.bean.SpringJobBean;
+import com.fzrj.schedule.client.bean.SpringJobExecutor;
 import com.fzrj.schedule.client.util.ConfigUtil;
 import com.fzrj.schedule.client.util.JsonUtil;
 import com.fzrj.schedule.client.util.MqConnectionFactory;
-import com.fzrj.schedule.client.util.SpringContextUtil;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
@@ -26,18 +23,20 @@ import com.rabbitmq.client.Envelope;
  * @date:2016年12月23日 下午1:25:51
  * @author:WangHao
  */
-public class MqReceiver implements Runnable
+public class MqReceiver
 {
 	private static Logger logger = LogManager.getLogger(MqReceiver.class);
 
-	@Override
-	public void run()
+	private static Channel channel = null;
+
+	/*
+	 * 启动消息接收器
+	 */
+	public static void startConsumer()
 	{
-		ConnectionFactory factory = MqConnectionFactory.getInstance();
 		try
 		{
-			Connection connection = factory.newConnection();
-			final Channel channel = connection.createChannel();
+			channel = MqConnectionFactory.getInstance();
 			// 同时只会接收一条未处理的消息
 			// 消息未处理完之前，服务器不会再向该消费者投递消息
 			channel.basicQos(1);
@@ -61,23 +60,7 @@ public class MqReceiver implements Runnable
 					{
 						// 根据消息调用相应的Spring中bean的方法
 						SpringJobBean springJobBean = JsonUtil.convertStringToObj(message, SpringJobBean.class);
-						Object springBean = SpringContextUtil.getBean(springJobBean.getBeanName());
-						Method[] mArray = springBean.getClass().getDeclaredMethods();
-						boolean methodFound = false;
-						for (Method m : mArray)
-						{
-							if (m.getName().equals(springJobBean.getMethodName()))
-							{
-								methodFound = true;
-								Class clzz = m.getParameterTypes()[0];
-								m.invoke(springBean, JsonUtil.convertStringToObj(springJobBean.getParamBean(), clzz));
-								break;
-							}
-						}
-						if (!methodFound)
-						{
-							throw new Exception("任务方法名错误" + springJobBean);
-						}
+						SpringJobExecutor.invokeBeanMethod(springJobBean);
 					}
 					catch (Exception e)
 					{

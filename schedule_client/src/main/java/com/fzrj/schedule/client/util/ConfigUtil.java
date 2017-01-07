@@ -133,10 +133,20 @@ public class ConfigUtil
 		return EXCHANGE_PREFIX + "_" + platName + "_" + env;
 	}
 
-	// 获取平台某个服务的专用队列名
+	// 获取平台本服务的专用队列名
 	public static String getPlatQueue()
 	{
 		return QUEUE_PREFIX + "_" + platServer + "_" + env;
+	}
+
+	// 获取平台其他服务的专用队列名
+	public static String getPlatQueue(String serverName)
+	{
+		if (!serverList.contains(serverName))
+		{
+			throw new IllegalArgumentException("定时任务服务名非法");
+		}
+		return QUEUE_PREFIX + "_" + serverName + "_" + env;
 	}
 
 	// 获取定时器交换机名
@@ -174,5 +184,4 @@ public class ConfigUtil
 	{
 		return DELETE_JOB_PRE + "_" + env + "_" + scheduleServer;
 	}
-
 }

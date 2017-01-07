@@ -1,5 +1,8 @@
 package com.fzrj.schedule.client.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -12,8 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonUtil
 {
-	
+
 	private static Logger logger = LogManager.getLogger(JsonUtil.class);
+
 	/**
 	 * javabean转json
 	 */
@@ -26,7 +30,7 @@ public class JsonUtil
 		}
 		catch (JsonProcessingException e)
 		{
-			e.printStackTrace();
+			logger.error("bean转Json字串异常", e);
 			return null;
 		}
 	}
@@ -44,13 +48,13 @@ public class JsonUtil
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("Json字串转换bean异常", e);
 			return null;
 		}
 	}
-	
+
 	public static void main(String[] args)
 	{
-		System.out.println(convertStringToObj(convertObjToString(new Integer(1)), Integer.class));
+		System.out.println(convertObjToString(new Object()));
 	}
 }
