@@ -10,6 +10,7 @@
 	</parent>
 	<groupId>com.fzrj.schedule</groupId>
 	<artifactId>schedule_client</artifactId>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 	<name>schedule_client</name>
 	<url>http://maven.apache.org</url>
