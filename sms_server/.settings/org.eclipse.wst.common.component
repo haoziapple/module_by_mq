@@ -4,6 +4,7 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
 
         <dependent-module archiveName="sms_service-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/sms_service/sms_service">
             <dependency-type>uses</dependency-type>
@@ -14,8 +15,7 @@
         <dependent-module archiveName="sms_bean-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/sms_bean/sms_bean">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-
-        <property name="java-output-path" value="/sms_server/target/classes"/>
         <property name="context-root" value="fzrj_sms_service"/>
+        <property name="java-output-path" value="/sms_server/target/classes"/>
     </wb-module>
 </project-modules>
