@@ -2,6 +2,7 @@ package com.fzrj.schedule.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fzrj.schedule.bean.job.JobBean;
+import com.fzrj.schedule.bean.jobdetail.mq.MqMsgBean;
 import com.fzrj.schedule.bean.mqctrl.AddHttpCronBean;
 import com.fzrj.schedule.bean.mqctrl.AddHttpSimpleBean;
 import com.fzrj.schedule.bean.mqctrl.AddMqCronBean;
@@ -112,6 +113,26 @@ public class ScheduleClient
 			// 发送消息
 			Channel channel = MqConnectionFactory.getInstance();
 			channel.basicPublish(ConfigUtil.getSchExchange(), ConfigUtil.getDelJobKey(),
+					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 转发消息，立即调用某个服务的方法
+	 */
+	public static void routeMsg(MqMsgBean mqMsgBean)
+	{
+		ObjectMapper mapper = new ObjectMapper(); // 转换器
+		try
+		{
+			String reqStr = mapper.writeValueAsString(mqMsgBean);
+			// 发送消息
+			Channel channel = MqConnectionFactory.getInstance();
+			channel.basicPublish(ConfigUtil.getSchExchange(), ConfigUtil.getRouteMsgKey(),
 					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
 		}
 		catch (Exception e)

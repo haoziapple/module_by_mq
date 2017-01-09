@@ -6,13 +6,10 @@ import java.util.concurrent.TimeoutException;
 import com.fzrj.schedule.bean.job.JobBean;
 import com.fzrj.schedule.bean.job.SimpleJobBean;
 import com.fzrj.schedule.bean.jobdetail.http.HttpReqBean;
-import com.fzrj.schedule.bean.jobdetail.mq.MqMsgBean;
 import com.fzrj.schedule.bean.mqctrl.AddHttpSimpleBean;
-import com.fzrj.schedule.bean.mqctrl.AddMqSimpleBean;
 import com.fzrj.schedule.client.ScheduleClient;
 import com.fzrj.schedule.client.builder.SpringJobBuilder;
 import com.fzrj.schedule.client.factory.JobFactory;
-import com.fzrj.schedule.client.factory.MqMsgFactory;
 
 /**
  * @className:com.fzrj.schedule.client.demo.ClientDemo

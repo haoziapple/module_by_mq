@@ -1,4 +1,4 @@
-package com.fzrj.schedule.server;
+package com.fzrj.schedule.server.receiver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -7,48 +7,46 @@ import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fzrj.schedule.bean.job.JobBean;
-import com.fzrj.schedule.service.schedule.ScheduleService;
+import com.fzrj.schedule.bean.jobdetail.mq.MqMsgBean;
+import com.fzrj.schedule.service.mqmsg.MqMsgService;
 import com.rabbitmq.client.Channel;
 
 /**
- * @className:com.fzrj.schedule.server.DeleteJobReceiver
- * @description:删除定时任务消息接收类
+ * @className:com.fzrj.schedule.server.receiver.RouteMsgReceiver
+ * @description:转发MQ消息接收类
  * @version:v1.0.0
- * @date:2016年12月19日 下午7:31:03
+ * @date:2017年1月9日 下午2:40:55
  * @author:WangHao
  */
-public class DeleteJobReceiver implements ChannelAwareMessageListener
+public class RouteMsgReceiver implements ChannelAwareMessageListener
 {
-	private static Logger logger = LogManager.getLogger(DeleteJobReceiver.class);
-
+	private static Logger logger = LogManager.getLogger(RouteMsgReceiver.class);
 	@Autowired
-	private ScheduleService scheduleService;
+	private MqMsgService mqMsgService;
 
+	/**
+	 * 收到消息后立即进行转发
+	 */
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception
 	{
-
-		JobBean jobBean = null;
+		MqMsgBean mqMsgBean = null;
 		try
 		{
 			String msg = new String(message.getBody(), "UTF-8");
-			logger.debug("删除定时任务消息接收msg:" + msg);
+			logger.debug("转发MQ消息msg:" + msg);
 			ObjectMapper mapper = new ObjectMapper(); // 转换器
-			jobBean = mapper.readValue(msg, JobBean.class);
+			mqMsgBean = mapper.readValue(msg, MqMsgBean.class);
 		}
 		catch (Exception e)
 		{
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-			logger.error("删除定时任务消息,请求非法", e);
+			logger.error("转发MQ消息msg,请求非法", e);
 			return;
 		}
 
-		// 确认接收消息
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
-		scheduleService.deleteJob(jobBean);
-
+		mqMsgService.sendMqMsg(mqMsgBean);
 	}
 
 }

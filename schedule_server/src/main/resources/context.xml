@@ -138,8 +138,9 @@
 	<rabbit:queue id="deleteJobQueue"
 		name="deleteJob_queue_${rabbitmq.env}_${rabbitmq.server.key}" durable="true"
 		auto-delete="false" exclusive="false" />
-	<rabbit:queue id="haoziDemoQueue" name="haozi_demo_queue"
-		durable="true" auto-delete="false" exclusive="false" />
+	<rabbit:queue id="routeMsgQueue"
+		name="routeMsg_queue_${rabbitmq.env}_${rabbitmq.server.key}" durable="true"
+		auto-delete="false" exclusive="false" />
 
 	<!-- 定义direct exchange，绑定queue -->
 	<rabbit:direct-exchange name="schedule_exchange_${rabbitmq.env}"
@@ -155,7 +156,8 @@
 				key="addMqSimpleJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
 			<rabbit:binding queue="deleteJobQueue"
 				key="deleteJob_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
-			<rabbit:binding queue="haoziDemoQueue" key="haozi_demo"></rabbit:binding>
+			<rabbit:binding queue="routeMsgQueue"
+				key="routeMsg_${rabbitmq.env}_${rabbitmq.server.key}"></rabbit:binding>
 		</rabbit:bindings>
 	</rabbit:direct-exchange>
 
@@ -172,16 +174,16 @@
 		<rabbit:listener queues="addMqCronJobQueue" ref="addMqCronJobReceiver" />
 		<rabbit:listener queues="addMqSimpleJobQueue" ref="addMqSimpleJobReceiver" />
 		<rabbit:listener queues="deleteJobQueue" ref="deleteJobReceiver" />
-		<rabbit:listener queues="haoziDemoQueue" ref="msgReceiver" />
+		<rabbit:listener queues="routeMsgQueue" ref="routeMsgReceiver" />
 	</rabbit:listener-container>
 
 	<!-- 消息接收者 -->
-	<bean id="addHttpCronJobReceiver" class="com.fzrj.schedule.server.AddHttpCronJobReceiver"></bean>
-	<bean id="addHttpSimpleJobReceiver" class="com.fzrj.schedule.server.AddHttpSimpleJobReceiver"></bean>
-	<bean id="addMqCronJobReceiver" class="com.fzrj.schedule.server.AddMqCronJobReceiver"></bean>
-	<bean id="addMqSimpleJobReceiver" class="com.fzrj.schedule.server.AddMqSimpleJobReceiver"></bean>
-	<bean id="deleteJobReceiver" class="com.fzrj.schedule.server.DeleteJobReceiver"></bean>
-	<bean id="msgReceiver" class="com.fzrj.schedule.server.test.ScheduleMsgReceiver"></bean>
+	<bean id="addHttpCronJobReceiver" class="com.fzrj.schedule.server.receiver.AddHttpCronJobReceiver"></bean>
+	<bean id="addHttpSimpleJobReceiver" class="com.fzrj.schedule.server.receiver.AddHttpSimpleJobReceiver"></bean>
+	<bean id="addMqCronJobReceiver" class="com.fzrj.schedule.server.receiver.AddMqCronJobReceiver"></bean>
+	<bean id="addMqSimpleJobReceiver" class="com.fzrj.schedule.server.receiver.AddMqSimpleJobReceiver"></bean>
+	<bean id="deleteJobReceiver" class="com.fzrj.schedule.server.receiver.DeleteJobReceiver"></bean>
+	<bean id="routeMsgReceiver" class="com.fzrj.schedule.server.receiver.RouteMsgReceiver"></bean>
 
 	<!-- 实现异常事件处理逻辑 -->
 	<bean id="retryOperationsInterceptorFactoryBean"

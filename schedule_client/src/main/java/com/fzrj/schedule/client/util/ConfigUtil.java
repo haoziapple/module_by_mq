@@ -38,6 +38,8 @@ public class ConfigUtil
 	private static final String ADD_MQ_SIMPLE_JOB_PRE = "addMqSimpleJob";
 	// 删除任务前缀
 	private static final String DELETE_JOB_PRE = "deleteJob";
+	// 转发消息前缀
+	private static final String ROUTE_MSG_PRE = "routeMsg";
 
 	// mq服务器地址
 	private static String host;
@@ -183,5 +185,11 @@ public class ConfigUtil
 	public static String getDelJobKey()
 	{
 		return DELETE_JOB_PRE + "_" + env + "_" + scheduleServer;
+	}
+
+	// 获取转发消息路由键
+	public static String getRouteMsgKey()
+	{
+		return ROUTE_MSG_PRE + "_" + env + "_" + scheduleServer;
 	}
 }

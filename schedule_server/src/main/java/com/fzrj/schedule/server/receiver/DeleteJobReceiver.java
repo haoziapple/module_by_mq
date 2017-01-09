@@ -1,4 +1,4 @@
-package com.fzrj.schedule.server;
+package com.fzrj.schedule.server.receiver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -7,20 +7,20 @@ import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fzrj.schedule.bean.mqctrl.AddHttpSimpleBean;
+import com.fzrj.schedule.bean.job.JobBean;
 import com.fzrj.schedule.service.schedule.ScheduleService;
 import com.rabbitmq.client.Channel;
 
 /**
- * @className:com.fzrj.schedule.server.AddHttpSimpleJobReceiver
- * @description:添加一般类型Http定时任务消息接收类
+ * @className:com.fzrj.schedule.server.receiver.DeleteJobReceiver
+ * @description:删除定时任务消息接收类
  * @version:v1.0.0
- * @date:2016年12月19日 下午7:49:38
+ * @date:2016年12月19日 下午7:31:03
  * @author:WangHao
  */
-public class AddHttpSimpleJobReceiver implements ChannelAwareMessageListener
+public class DeleteJobReceiver implements ChannelAwareMessageListener
 {
-	private static Logger logger = LogManager.getLogger(AddHttpCronJobReceiver.class);
+	private static Logger logger = LogManager.getLogger(DeleteJobReceiver.class);
 
 	@Autowired
 	private ScheduleService scheduleService;
@@ -28,25 +28,27 @@ public class AddHttpSimpleJobReceiver implements ChannelAwareMessageListener
 	@Override
 	public void onMessage(Message message, Channel channel) throws Exception
 	{
-		AddHttpSimpleBean addhttpSimpleBean = null;
+
+		JobBean jobBean = null;
 		try
 		{
 			String msg = new String(message.getBody(), "UTF-8");
-			logger.debug("添加一般类型Http定时任务消息接收msg:" + msg);
+			logger.debug("删除定时任务消息接收msg:" + msg);
 			ObjectMapper mapper = new ObjectMapper(); // 转换器
-			addhttpSimpleBean = mapper.readValue(msg, AddHttpSimpleBean.class);
+			jobBean = mapper.readValue(msg, JobBean.class);
 		}
 		catch (Exception e)
 		{
-			logger.error("添加一般类型Http定时任务,请求非法", e);
-			// 确认消息并返回，不处理非法消息
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+			logger.error("删除定时任务消息,请求非法", e);
 			return;
 		}
+
+		// 确认接收消息
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
 		// 处理定时器逻辑的抛出异常会被MsgRecoverer处理
-		scheduleService.addHttpSimpleJob(addhttpSimpleBean.getHttpReqBean(), addhttpSimpleBean.getSimpleJobBean(),
-				addhttpSimpleBean.isOverWrite());
+		scheduleService.deleteJob(jobBean);
+
 	}
 
 }

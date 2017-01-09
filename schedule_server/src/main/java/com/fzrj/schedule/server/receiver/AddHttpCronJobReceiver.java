@@ -1,4 +1,4 @@
-package com.fzrj.schedule.server;
+package com.fzrj.schedule.server.receiver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +12,7 @@ import com.fzrj.schedule.service.schedule.ScheduleService;
 import com.rabbitmq.client.Channel;
 
 /**
- * @className:com.fzrj.schedule.server.AddHttpCronJobReceiver
+ * @className:com.fzrj.schedule.server.receiver.AddHttpCronJobReceiver
  * @description:添加Cron类型Http定时任务消息接收类
  * @version:v1.0.0
  * @date:2016年12月19日 下午7:43:37
