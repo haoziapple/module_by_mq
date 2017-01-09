@@ -4,7 +4,6 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
-<<<<<<< HEAD
 
         <dependent-module archiveName="routing_service-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/routing_service/routing_service">
             <dependency-type>uses</dependency-type>
@@ -16,8 +15,7 @@
             <dependency-type>uses</dependency-type>
         </dependent-module>
 
-=======
->>>>>>> parent of 4c941f9... .gitignore只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未track状态），然后再提交：
+
         <property name="java-output-path" value="/routing_server/target/classes"/>
         <property name="context-root" value="fzrj_routing_service"/>
     </wb-module>
