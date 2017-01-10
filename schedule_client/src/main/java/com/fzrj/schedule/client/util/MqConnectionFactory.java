@@ -105,7 +105,7 @@ public class MqConnectionFactory
 			if (channel.getConnection().isOpen())
 				channel.getConnection().close();
 		}
-		if (RPCChannel != null)
+		if (RPCChannel != null && channel.isOpen())
 		{
 			RPCChannel.close();
 			if (RPCChannel.getConnection().isOpen())
