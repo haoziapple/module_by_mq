@@ -40,6 +40,8 @@ public class ConfigUtil
 	private static final String DELETE_JOB_PRE = "deleteJob";
 	// 转发消息前缀
 	private static final String ROUTE_MSG_PRE = "routeMsg";
+	// RPC调用前缀
+	public static final String RPC_PRE = "RPC";
 
 	// mq服务器地址
 	private static String host;
@@ -139,6 +141,12 @@ public class ConfigUtil
 	public static String getPlatQueue()
 	{
 		return QUEUE_PREFIX + "_" + platServer + "_" + env;
+	}
+
+	// 获取平台本服务的RPC调用队列名
+	public static String getRPCPlatQueue()
+	{
+		return RPC_PRE + "_" + getPlatQueue();
 	}
 
 	// 获取平台其他服务的专用队列名

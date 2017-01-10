@@ -122,7 +122,7 @@ public class ScheduleClient
 	}
 
 	/**
-	 * 转发消息，立即调用某个服务的方法
+	 * 通过调度器转发消息，立即调用某个服务的方法
 	 */
 	public static void routeMsg(MqMsgBean mqMsgBean)
 	{
@@ -139,5 +139,32 @@ public class ScheduleClient
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @Description:使用mq进行rpc远程调用,不再通过调度器转发
+	 * @param mqMsgBean
+	 * @return
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2017年1月10日 上午11:10:12
+	 */
+	public String mqRPC(MqMsgBean mqMsgBean)
+	{
+		ObjectMapper mapper = new ObjectMapper(); // 转换器
+		try
+		{
+			String reqStr = mapper.writeValueAsString(mqMsgBean);
+			// 发送消息
+			Channel channel = MqConnectionFactory.getInstance();
+			channel.basicPublish(mqMsgBean.getExchangeName(), mqMsgBean.getRoutingKey(),
+					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 }

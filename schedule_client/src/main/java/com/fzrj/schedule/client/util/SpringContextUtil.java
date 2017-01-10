@@ -51,6 +51,8 @@ public class SpringContextUtil implements ApplicationContextAware, InitializingB
 		logger.debug("启动一个队列消息接收线程");
 		// 初始化完成后，启动一个队列消息接收线程
 		MqReceiver.startConsumer();
+		logger.debug("启动RPC调用的接收线程");
+		MqReceiver.startRPCConsumer();
 	}
 
 	@Override
