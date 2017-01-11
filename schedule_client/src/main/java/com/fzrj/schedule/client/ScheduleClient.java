@@ -1,5 +1,8 @@
 package com.fzrj.schedule.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fzrj.schedule.bean.job.JobBean;
 import com.fzrj.schedule.bean.jobdetail.mq.MqMsgBean;
@@ -9,6 +12,7 @@ import com.fzrj.schedule.bean.mqctrl.AddMqCronBean;
 import com.fzrj.schedule.bean.mqctrl.AddMqSimpleBean;
 import com.fzrj.schedule.client.util.ConfigUtil;
 import com.fzrj.schedule.client.util.MqConnectionFactory;
+import com.fzrj.schedule.client.util.MqRPCUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
 
@@ -21,6 +25,8 @@ import com.rabbitmq.client.MessageProperties;
  */
 public class ScheduleClient
 {
+	private static Logger logger = LogManager.getLogger(ScheduleClient.class);
+
 	/**
 	 * 添加Cron类型的Http定时任务
 	 */
@@ -37,7 +43,7 @@ public class ScheduleClient
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("添加Cron类型的Http定时任务异常", e);
 		}
 	}
 
@@ -57,7 +63,7 @@ public class ScheduleClient
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("添加一般类型的Http定时任务异常", e);
 		}
 	}
 
@@ -77,7 +83,7 @@ public class ScheduleClient
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("添加cron类型的mq定时任务异常", e);
 		}
 	}
 
@@ -97,7 +103,7 @@ public class ScheduleClient
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("添加一般类型的mq定时任务异常", e);
 		}
 	}
 
@@ -117,7 +123,7 @@ public class ScheduleClient
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("删除定时任务异常", e);
 		}
 	}
 
@@ -137,7 +143,7 @@ public class ScheduleClient
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("通过调度器转发消息，立即调用某个服务的方法异常", e);
 		}
 	}
 
@@ -149,22 +155,18 @@ public class ScheduleClient
 	 * @author:WangHao
 	 * @date:2017年1月10日 上午11:10:12
 	 */
-	public String mqRPC(MqMsgBean mqMsgBean)
+	public static String mqRPC(MqMsgBean mqMsgBean)
 	{
-		ObjectMapper mapper = new ObjectMapper(); // 转换器
+		String result = null;
 		try
 		{
-			String reqStr = mapper.writeValueAsString(mqMsgBean);
-			// 发送消息
-			Channel channel = MqConnectionFactory.getInstance();
-			channel.basicPublish(mqMsgBean.getExchangeName(), mqMsgBean.getRoutingKey(),
-					MessageProperties.PERSISTENT_TEXT_PLAIN, reqStr.getBytes("UTF-8"));
+			result = new MqRPCUtil().call(mqMsgBean);
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("使用mq进行rpc远程调用,不再通过调度器转发异常", e);
 		}
 
-		return null;
+		return result;
 	}
 }

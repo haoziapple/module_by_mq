@@ -16,7 +16,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import com.rabbitmq.client.QueueingConsumer;
 
 /**
  * @className:com.fzrj.schedule.client.MqReceiver
@@ -105,9 +104,6 @@ public class MqReceiver
 			RPCChannel.queueBind(ConfigUtil.getRPCPlatQueue(), ConfigUtil.getPlatExchange(),
 					ConfigUtil.getRPCPlatQueue());
 
-			// 为rpc_queue队列创建消费者，用于处理请求
-			// QueueingConsumer consumer = new QueueingConsumer(RPCChannel);
-
 			logger.debug("等待RPC调用请求");
 			Consumer consumer2 = new DefaultConsumer(RPCChannel)
 			{
@@ -148,43 +144,6 @@ public class MqReceiver
 			RPCChannel.basicConsume(ConfigUtil.getRPCPlatQueue(), false, consumer2);
 			logger.debug("启动RPC调用消息接收器完成-exchange:" + ConfigUtil.getPlatExchange() + " queue:"
 					+ ConfigUtil.getRPCPlatQueue());
-
-			// 远程回调结果
-			// String response;
-			// while (true)
-			// {
-			// QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-			//
-			// // 获取请求中的correlationId属性值，并将其设置到结果消息的correlationId属性中
-			// BasicProperties props = delivery.getProperties();
-			// BasicProperties replyProps = new
-			// BasicProperties.Builder().correlationId(props.getCorrelationId())
-			// .build();
-			// // 获取回调队列名字
-			// String callQueueName = props.getReplyTo();
-			//
-			// String message = new String(delivery.getBody(), "UTF-8");
-			// logger.debug("mqRPC调用接收消息" + message);
-			// try
-			// {
-			// // 根据消息调用相应的Spring中bean的方法
-			// SpringJobBean springJobBean =
-			// JsonUtil.convertStringToObj(message, SpringJobBean.class);
-			// response = SpringJobExecutor.RPCInvokeBeanMethod(springJobBean);
-			// }
-			// catch (Exception e)
-			// {
-			// logger.error("mqRPC调用执行异常", e);
-			// response = "";
-			// }
-			//
-			// // 先发送回调结果
-			// channel.basicPublish(ConfigUtil.getPlatExchange(), callQueueName,
-			// replyProps, response.getBytes());
-			// // 后手动发送消息反馈,确认接收消息
-			// channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-			// }
-
 		}
 		catch (Exception e)
 		{

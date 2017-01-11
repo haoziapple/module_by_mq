@@ -32,6 +32,8 @@ public class MqRPCUtil
 		channel = MqConnectionFactory.getRPCInstance();
 		// 为每一个客户端获取一个随机的回调队列
 		replyQueueName = channel.queueDeclare().getQueue();
+		// 绑定队列
+		channel.queueBind(replyQueueName, ConfigUtil.getPlatExchange(), replyQueueName);
 		// 为每一个客户端创建一个消费者（用于监听回调队列，获取结果）
 		consumer = new QueueingConsumer(channel);
 		// 消费者与队列关联
@@ -57,8 +59,8 @@ public class MqRPCUtil
 		// 发送消息到rpc_queue队列
 		try
 		{
-			channel.basicPublish(mqMsgBean.getExchangeName(), ConfigUtil.RPC_PRE + mqMsgBean.getRoutingKey(), props,
-					mqMsgBean.getMsgBody().getBytes());
+			channel.basicPublish(mqMsgBean.getExchangeName(), ConfigUtil.RPC_PRE + "_" + mqMsgBean.getRoutingKey(),
+					props, mqMsgBean.getMsgBody().getBytes());
 			while (true)
 			{
 				QueueingConsumer.Delivery delivery = consumer.nextDelivery();
@@ -72,6 +74,18 @@ public class MqRPCUtil
 		catch (Exception e)
 		{
 			logger.error("远程MQ调用方法异常", e);
+		}
+		finally
+		{
+			try
+			{
+				// 删除回调队列
+				channel.queueDelete(replyQueueName);
+			}
+			catch (IOException e)
+			{
+				logger.error("删除回调队列异常", e);
+			}
 		}
 		return response;
 	}
