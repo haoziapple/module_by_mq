@@ -1,5 +1,11 @@
 package com.fzrj.schedule.client;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import org.springframework.beans.BeanUtils;
@@ -62,8 +68,13 @@ public class TestMethod
 		}
 	}
 
-	public static class BeanTarget
+	public static class BeanTarget implements Serializable
 	{
+		/**
+		*
+		*/
+		private static final long serialVersionUID = 1L;
+
 		private String target1 = "";
 
 		private String target2 = "";
@@ -142,7 +153,20 @@ public class TestMethod
 		beanSource.setSource2("s2");
 	}
 
-	public static void main(String[] args)
+	public Object deepClone(Object o) throws IOException, ClassNotFoundException
+	{
+		/* 写入当前对象的二进制流 */
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(bos);
+		oos.writeObject(o);
+
+		/* 读出二进制流产生的新对象 */
+		ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+		ObjectInputStream ois = new ObjectInputStream(bis);
+		return ois.readObject();
+	}
+
+	public static void main(String[] args) throws ClassNotFoundException, IOException
 	{
 		Integer i = 1;
 		TestMethod test = new TestMethod();
@@ -175,7 +199,13 @@ public class TestMethod
 		System.out.println(beanSource);
 
 		// 递归定义,调用toString方法时造成内存溢出
-		beanTarget.setBean(beanTarget);
+		// beanTarget.setBean(beanTarget);
 		// System.out.println(beanTarget);
+
+		// 深拷贝
+		BeanTarget beanTarget3 = (BeanTarget) test.deepClone(beanTarget);
+		beanTarget3.getBean().setSource1("3");
+		System.out.println(beanTarget);
+		System.out.println(beanTarget3);
 	}
 }

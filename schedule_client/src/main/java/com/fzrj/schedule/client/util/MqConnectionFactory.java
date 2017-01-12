@@ -20,12 +20,21 @@ public class MqConnectionFactory
 {
 	private static Logger logger = LogManager.getLogger(MqConnectionFactory.class);
 
-	private static ConnectionFactory factory = null;
+	private static ConnectionFactory factory = new ConnectionFactory();
 	// 单例模式，保证一个服务只使用一个消息通道
 	private static Channel channel = null;
 	// RPC调用使用的通道
 	private static Channel RPCChannel = null;
 	private static Object lock = new Object();
+
+	static
+	{
+		factory.setHost(ConfigUtil.getHost());
+		factory.setPort(Integer.parseInt(ConfigUtil.getPort()));
+		factory.setUsername(ConfigUtil.getUserName());
+		factory.setPassword(ConfigUtil.getPassword());
+		logger.debug("初始化rabbitmq连接工厂:" + factory.getHost());
+	}
 
 	/**
 	 * @Description:
@@ -44,13 +53,6 @@ public class MqConnectionFactory
 			{
 				if (channel == null || !channel.isOpen())
 				{
-					if (factory == null)
-						factory = new ConnectionFactory();
-					factory.setHost(ConfigUtil.getHost());
-					factory.setPort(Integer.parseInt(ConfigUtil.getPort()));
-					factory.setUsername(ConfigUtil.getUserName());
-					factory.setPassword(ConfigUtil.getPassword());
-					logger.debug("初始化rabbitmq连接工厂:" + factory.getHost());
 					channel = factory.newConnection().createChannel();
 				}
 			}
@@ -75,13 +77,6 @@ public class MqConnectionFactory
 			{
 				if (RPCChannel == null || !RPCChannel.isOpen())
 				{
-					if (factory == null)
-						factory = new ConnectionFactory();
-					factory.setHost(ConfigUtil.getHost());
-					factory.setPort(Integer.parseInt(ConfigUtil.getPort()));
-					factory.setUsername(ConfigUtil.getUserName());
-					factory.setPassword(ConfigUtil.getPassword());
-					logger.debug("初始化rabbitmq连接工厂:" + factory.getHost());
 					RPCChannel = factory.newConnection().createChannel();
 				}
 			}

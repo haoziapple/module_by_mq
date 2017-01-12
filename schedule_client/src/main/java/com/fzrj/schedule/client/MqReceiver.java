@@ -28,6 +28,9 @@ public class MqReceiver
 {
 	private static Logger logger = LogManager.getLogger(MqReceiver.class);
 
+	// 消息接收与发送共用一个channel
+	// 如果有多个consumer的话，共用channel
+	// 考虑是否让每个consumer维护自己的channel？
 	private static Channel channel = null;
 
 	private static Channel RPCChannel = null;
@@ -112,7 +115,7 @@ public class MqReceiver
 						byte[] body) throws IOException
 				{
 					String message = new String(body, "UTF-8");
-					logger.debug("mq定时任务接收消息" + message);
+					logger.debug("mqRPC调用接收消息" + message);
 					// 获取请求中的correlationId属性值，并将其设置到结果消息的correlationId属性中
 					BasicProperties props = properties;
 					BasicProperties replyProps = new BasicProperties.Builder().correlationId(props.getCorrelationId())
@@ -129,7 +132,7 @@ public class MqReceiver
 					}
 					catch (Exception e)
 					{
-						logger.error("mq定时任务执行异常", e);
+						logger.error("mqRPC调用执行异常", e);
 					}
 					finally
 					{

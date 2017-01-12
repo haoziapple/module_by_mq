@@ -21,8 +21,11 @@ import com.rabbitmq.client.QueueingConsumer;
 public class MqRPCUtil
 {
 	private static Logger logger = LogManager.getLogger(MqRPCUtil.class);
-
+	// 发送请求与回调通道
+	// 暂时与接受RPC请求的consumer共用channel
+	// 是否每次请求新建和销毁单独的channel？效率问题?
 	private Channel channel;
+	// 回调队列
 	private String replyQueueName;
 	private QueueingConsumer consumer;
 
@@ -36,7 +39,7 @@ public class MqRPCUtil
 		channel.queueBind(replyQueueName, ConfigUtil.getPlatExchange(), replyQueueName);
 		// 为每一个客户端创建一个消费者（用于监听回调队列，获取结果）
 		consumer = new QueueingConsumer(channel);
-		// 消费者与队列关联
+		// 消费者与队列关联,回调消息时自动确认的
 		channel.basicConsume(replyQueueName, true, consumer);
 	}
 
@@ -84,7 +87,7 @@ public class MqRPCUtil
 			}
 			catch (IOException e)
 			{
-				logger.error("删除回调队列异常", e);
+				logger.error("删除RPC回调队列异常", e);
 			}
 		}
 		return response;
