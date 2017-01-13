@@ -9,7 +9,7 @@ import com.fzrj.schedule.client.bean.SpringJobBean;
 import com.fzrj.schedule.client.bean.SpringJobExecutor;
 import com.fzrj.schedule.client.util.ConfigUtil;
 import com.fzrj.schedule.client.util.JsonUtil;
-import com.fzrj.schedule.client.util.MqConnectionFactory;
+import com.fzrj.schedule.client.util.MqChannelFactory;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
@@ -28,13 +28,6 @@ public class MqReceiver
 {
 	private static Logger logger = LogManager.getLogger(MqReceiver.class);
 
-	// 消息接收与发送共用一个channel
-	// 如果有多个consumer的话，共用channel
-	// 考虑是否让每个consumer维护自己的channel？
-	private static Channel channel = null;
-
-	private static Channel RPCChannel = null;
-
 	/**
 	 * 启动消息接收器
 	 */
@@ -42,7 +35,7 @@ public class MqReceiver
 	{
 		try
 		{
-			channel = MqConnectionFactory.getInstance();
+			final Channel channel = MqChannelFactory.createChannel();
 			// 同时只会接收一条未处理的消息
 			// 消息未处理完之前，服务器不会再向该消费者投递消息
 			channel.basicQos(1);
@@ -95,7 +88,7 @@ public class MqReceiver
 	{
 		try
 		{
-			RPCChannel = MqConnectionFactory.getRPCInstance();
+			final Channel RPCChannel = MqChannelFactory.createChannel();
 			// 同时只会接收一条未处理的消息
 			// 消息未处理完之前，服务器不会再向该消费者投递消息
 			RPCChannel.basicQos(1);
@@ -108,7 +101,7 @@ public class MqReceiver
 					ConfigUtil.getRPCPlatQueue());
 
 			logger.debug("等待RPC调用请求");
-			Consumer consumer2 = new DefaultConsumer(RPCChannel)
+			Consumer consumer = new DefaultConsumer(RPCChannel)
 			{
 				@Override
 				public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
@@ -144,7 +137,7 @@ public class MqReceiver
 					}
 				}
 			};
-			RPCChannel.basicConsume(ConfigUtil.getRPCPlatQueue(), false, consumer2);
+			RPCChannel.basicConsume(ConfigUtil.getRPCPlatQueue(), false, consumer);
 			logger.debug("启动RPC调用消息接收器完成-exchange:" + ConfigUtil.getPlatExchange() + " queue:"
 					+ ConfigUtil.getRPCPlatQueue());
 		}

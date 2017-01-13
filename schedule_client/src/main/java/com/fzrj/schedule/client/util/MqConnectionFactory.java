@@ -1,12 +1,11 @@
 package com.fzrj.schedule.client.util;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 /**
@@ -21,90 +20,70 @@ public class MqConnectionFactory
 	private static Logger logger = LogManager.getLogger(MqConnectionFactory.class);
 
 	private static ConnectionFactory factory = new ConnectionFactory();
-	// 单例模式，保证一个服务只使用一个消息通道
-	private static Channel channel = null;
-	// RPC调用使用的通道
-	private static Channel RPCChannel = null;
+	// MQ连接实例
+	private static Connection connection = null;
 	private static Object lock = new Object();
 
 	static
 	{
+
 		factory.setHost(ConfigUtil.getHost());
 		factory.setPort(Integer.parseInt(ConfigUtil.getPort()));
 		factory.setUsername(ConfigUtil.getUserName());
 		factory.setPassword(ConfigUtil.getPassword());
+		// 设置连接自动重连
+		factory.setAutomaticRecoveryEnabled(true);
 		logger.debug("初始化rabbitmq连接工厂:" + factory.getHost());
+
 	}
 
 	/**
-	 * @Description:
+	 * @Description:获取MQ连接实例
 	 * @return
-	 * @throws IOException
-	 * @throws TimeoutException
 	 * @version:v1.0
 	 * @author:WangHao
 	 * @date:2017年1月6日 上午9:22:14
 	 */
-	public static Channel getInstance() throws IOException, TimeoutException
+	public static Connection getInstance()
 	{
-		if (channel == null || !channel.isOpen())
+		if (connection == null)
 		{
 			synchronized (lock)
 			{
-				if (channel == null || !channel.isOpen())
+				if (connection == null)
 				{
-					channel = factory.newConnection().createChannel();
+					try
+					{
+						connection = factory.newConnection();
+					}
+					catch (Exception e)
+					{
+						logger.error("获取MQ连接异常", e);
+					}
 				}
 			}
 		}
-		return channel;
+		return connection;
 	}
 
 	/**
-	 * @Description:获取RPC调用使用的channel
-	 * @return
-	 * @throws IOException
-	 * @throws TimeoutException
-	 * @version:v1.0
-	 * @author:WangHao
-	 * @date:2017年1月10日 下午3:18:17
-	 */
-	public static Channel getRPCInstance() throws IOException, TimeoutException
-	{
-		if (RPCChannel == null || !RPCChannel.isOpen())
-		{
-			synchronized (lock)
-			{
-				if (RPCChannel == null || !RPCChannel.isOpen())
-				{
-					RPCChannel = factory.newConnection().createChannel();
-				}
-			}
-		}
-		return channel;
-	}
-
-	/**
-	 * @Description:关闭通道和连接
-	 * @throws IOException
-	 * @throws TimeoutException
+	 * @Description:关闭MQ连接
 	 * @version:v1.0
 	 * @author:WangHao
 	 * @date:2017年1月6日 上午9:21:52
 	 */
-	public static void closeConnection() throws IOException, TimeoutException
+	public static void closeConnection()
 	{
-		if (channel != null && channel.isOpen())
+		if (connection != null)
 		{
-			channel.close();
-			if (channel.getConnection().isOpen())
-				channel.getConnection().close();
-		}
-		if (RPCChannel != null && channel.isOpen())
-		{
-			RPCChannel.close();
-			if (RPCChannel.getConnection().isOpen())
-				RPCChannel.getConnection().close();
+			try
+			{
+				connection.close();
+			}
+			catch (IOException e)
+			{
+				logger.error("关闭MQ连接异常", e);
+			}
 		}
 	}
 

@@ -20,10 +20,15 @@ import com.rabbitmq.client.QueueingConsumer;
  */
 public class MqRPCUtil
 {
+	// 将来有可能使用自带的RpcClient改写
+	// RpcClient rpc = new RpcClient(channel, exchangeName, routingKey);
+	// byte[] primitiveCall(byte[] message);
+	// String stringCall(String message)
+	// Map mapCall(Map message)
+	// Map mapCall(Object[] keyValuePairs)
+
 	private static Logger logger = LogManager.getLogger(MqRPCUtil.class);
 	// 发送请求与回调通道
-	// 暂时与接受RPC请求的consumer共用channel
-	// 是否每次请求新建和销毁单独的channel？效率问题?
 	private Channel channel;
 	// 回调队列
 	private String replyQueueName;
@@ -32,7 +37,7 @@ public class MqRPCUtil
 	public MqRPCUtil() throws IOException, TimeoutException
 	{
 		// 创建新的channel用于RPC调用
-		channel = MqConnectionFactory.getRPCInstance();
+		channel = MqChannelFactory.createChannel();
 		// 为每一个客户端获取一个随机的回调队列
 		replyQueueName = channel.queueDeclare().getQueue();
 		// 绑定队列
@@ -78,18 +83,26 @@ public class MqRPCUtil
 		{
 			logger.error("远程MQ调用方法异常", e);
 		}
-		finally
-		{
-			try
-			{
-				// 删除回调队列
-				channel.queueDelete(replyQueueName);
-			}
-			catch (IOException e)
-			{
-				logger.error("删除RPC回调队列异常", e);
-			}
-		}
 		return response;
+	}
+
+	/**
+	 * @Description:删除RPC队列与通道
+	 * @version:v1.0
+	 * @author:WangHao
+	 * @date:2017年1月13日 上午10:17:58
+	 */
+	public void cleanRPCChannel()
+	{
+		try
+		{
+			// 删除回调队列
+			channel.queueDelete(replyQueueName);
+			channel.close();
+		}
+		catch (Exception e)
+		{
+			logger.error("删除RPC回调队列异常", e);
+		}
 	}
 }
