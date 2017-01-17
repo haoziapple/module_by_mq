@@ -48,11 +48,15 @@ public class SpringContextUtil implements ApplicationContextAware, InitializingB
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		logger.debug("启动一个队列消息接收线程");
-		// 初始化完成后，启动一个队列消息接收线程
-		MqReceiver.startConsumer();
-		logger.debug("启动一个RPC调用的接收线程");
-		MqReceiver.startRPCConsumer();
+		int consumerNum = 2;
+		logger.debug("启动" + consumerNum + "个队列消息接收线程");
+		for (int i = 0; i < consumerNum; i++)
+		{
+			MqReceiver.startConsumer();
+			MqReceiver.startRPCConsumer();
+		}
+		logger.debug("启动" + consumerNum + "个RPC调用的接收线程");
+
 	}
 
 	@Override
