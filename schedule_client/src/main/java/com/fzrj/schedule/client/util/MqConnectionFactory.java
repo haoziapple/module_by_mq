@@ -21,7 +21,7 @@ public class MqConnectionFactory
 
 	private static ConnectionFactory factory = new ConnectionFactory();
 	// MQ连接实例
-	private static Connection connection = null;
+	private static volatile Connection connection = null;
 	private static Object lock = new Object();
 
 	static
