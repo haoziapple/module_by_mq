@@ -21,12 +21,11 @@ public class MqConnectionFactory
 
 	private static ConnectionFactory factory = new ConnectionFactory();
 	// MQ连接实例
-	private static volatile Connection connection = null;
-	private static Object lock = new Object();
+	private static Connection connection = null;
 
+	// 初始化连接
 	static
 	{
-
 		factory.setHost(ConfigUtil.getHost());
 		factory.setPort(Integer.parseInt(ConfigUtil.getPort()));
 		factory.setUsername(ConfigUtil.getUserName());
@@ -35,6 +34,14 @@ public class MqConnectionFactory
 		factory.setAutomaticRecoveryEnabled(true);
 		logger.debug("初始化rabbitmq连接工厂:" + factory.getHost());
 
+		try
+		{
+			connection = factory.newConnection();
+		}
+		catch (Exception e)
+		{
+			logger.error("获取MQ连接异常", e);
+		}
 	}
 
 	/**
@@ -46,23 +53,6 @@ public class MqConnectionFactory
 	 */
 	public static Connection getInstance()
 	{
-		if (connection == null)
-		{
-			synchronized (lock)
-			{
-				if (connection == null)
-				{
-					try
-					{
-						connection = factory.newConnection();
-					}
-					catch (Exception e)
-					{
-						logger.error("获取MQ连接异常", e);
-					}
-				}
-			}
-		}
 		return connection;
 	}
 
